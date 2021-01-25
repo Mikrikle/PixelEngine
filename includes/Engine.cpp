@@ -20,15 +20,18 @@ float pixelCanvas[ROWS * COLS * 3]{};
 
 void setPixel(float* canvas, int i, int j, float r, float g, float b)
 {
-	i = ROWS - i - 1;
-	canvas[i * (COLS * 3) + j * 3] = r;
-	canvas[i * (COLS * 3) + j * 3 + 1] = g;
-	canvas[i * (COLS * 3) + j * 3 + 2] = b;
+	if (i * (COLS * 3) + j * 3 + 2 < ROWS * COLS * 3 && i * (COLS * 3) + j * 3 + 2 > 0)
+	{
+		i = ROWS - i - 1;
+		canvas[i * (COLS * 3) + j * 3] = r;
+		canvas[i * (COLS * 3) + j * 3 + 1] = g;
+		canvas[i * (COLS * 3) + j * 3 + 2] = b;
+	}
 }
 
-void setLine(GLfloat* pixels, int i, int j,  GLfloat r, GLfloat g, GLfloat b, int i2, int j2, int width)
+void setLine(GLfloat* pixels, int i, int j, GLfloat r, GLfloat g, GLfloat b, int end_i, int end_j, int width)
 {
-	glm::vec2 move = glm::vec2(i - i2, j - j2);
+	glm::vec2 move = glm::vec2(i - end_i, j - end_j);
 	double len = glm::length(move);
 	double stepi = move.x / len;
 	double stepj = move.y / len;
@@ -38,7 +41,7 @@ void setLine(GLfloat* pixels, int i, int j,  GLfloat r, GLfloat g, GLfloat b, in
 		{
 			for (int k = 0; k < (int)ceil(len); k++)
 			{
-				setPixel(pixels, r, g, b, i2 + (stepi * k) + brushi, j2 + (stepj * k) + brushj);
+				setPixel(pixels, end_i + (stepi * k) + brushi, end_j + (stepj * k) + brushj, r, g, b);
 			}
 		}
 	}

@@ -14,15 +14,45 @@ unsigned int MousePosCol = 0;
 bool MouseLeftClick = false;
 bool MouseRightClick = false;
 
-int screen[ROWS][COLS]{};
+
 float pixelCanvas[ROWS * COLS * 3]{};
 
 
 void setPixel(float* canvas, int i, int j, float r, float g, float b)
 {
+	i = ROWS - i - 1;
 	canvas[i * (COLS * 3) + j * 3] = r;
 	canvas[i * (COLS * 3) + j * 3 + 1] = g;
 	canvas[i * (COLS * 3) + j * 3 + 2] = b;
+}
+
+void setLine(GLfloat* pixels, int i, int j,  GLfloat r, GLfloat g, GLfloat b, int i2, int j2, int width)
+{
+	glm::vec2 move = glm::vec2(i - i2, j - j2);
+	double len = glm::length(move);
+	double stepi = move.x / len;
+	double stepj = move.y / len;
+	for (int brushi = -width / 2; brushi <= width / 2; brushi++)
+	{
+		for (int brushj = -width / 2; brushj <= width / 2; brushj++)
+		{
+			for (int k = 0; k < (int)ceil(len); k++)
+			{
+				setPixel(pixels, r, g, b, i2 + (stepi * k) + brushi, j2 + (stepj * k) + brushj);
+			}
+		}
+	}
+}
+
+void setAllPixels(float* canvas, int arr[ROWS][COLS], float r, float g, float b)
+{
+	for (int i = 0; i < ROWS; i++)
+	{
+		for (int j = 0; j < COLS; j++)
+		{
+			setPixel(canvas, i, j, r, g, b);
+		}
+	}
 }
 
 static int TransformMouseXtoCol(unsigned int MousePosX)

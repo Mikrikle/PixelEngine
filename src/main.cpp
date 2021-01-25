@@ -15,7 +15,7 @@
 int main()
 {
 	initGLFWwindow("Game", WindowSizeX, WindowSizeY);
-	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f };
+	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
 	PixelDraw game(glm::make_mat4x3(colors));
 
 	while (!glfwWindowShouldClose(window))
@@ -25,7 +25,7 @@ int main()
 
 		if (MouseLeftClick)
 		{
-			setPixel(pixelCanvas, ROWS - MousePosRow, MousePosCol, 1.0f, 0.0f, 0.0f);
+			setPixel(pixelCanvas, MousePosRow, MousePosCol, 1.0f, 0.0f, 0.0f);
 		}
 
 		game.setOpacity(0.2f);
@@ -37,6 +37,7 @@ int main()
 
 	glfwTerminate();
 	return 0;
+
 }
 
 

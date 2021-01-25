@@ -11,25 +11,26 @@
 #include "../includes/Engine.cpp"
 #include "../includes/useGLFM.cpp"
 
+PxEngine pxengine(50, 50, 800, 800);
 
 int main()
 {
-	initGLFWwindow("Game", WindowSizeX, WindowSizeY);
+	initGLFWwindow("Game", PxEngine::WindowSizeX, PxEngine::WindowSizeY);
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
-	PixelDraw game(glm::make_mat4x3(colors));
+	PixelDraw cvs(glm::make_mat4x3(colors), pxengine.ROWS, pxengine.COLS);
 
 	while (!glfwWindowShouldClose(window))
 	{
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		if (MouseLeftClick)
+		if (PxEngine::MouseLeftClick)
 		{
-			setPixel(pixelCanvas, MousePosRow, MousePosCol, 1.0f, 0.0f, 0.0f);
+			pxengine.setPixel(pxengine.MousePosRow, pxengine.MousePosCol, 1.0f, 0.0f, 0.0f);
 		}
 
-		game.setOpacity(0.2f);
-		game.draw(pixelCanvas);
+		cvs.setOpacity(0.2f);
+		cvs.draw(pxengine.getCanvas());
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -43,15 +44,15 @@ int main()
 
 void glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
-	WindowSizeX = width;
-	WindowSizeY = height;
+	PxEngine::WindowSizeX = width;
+	PxEngine::WindowSizeY = height;
 	glViewport(0, 0, width, height);
 }
 
 void glfwmouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	MousePosCol = TransformMouseXtoCol(((int)xpos > ROWS) ? (ROWS - 1) : ((int)xpos < 0) ? 0 : (int)xpos);
-	MousePosRow = TransformMouseYtoRow(((int)ypos > COLS) ? (COLS - 1) : ((int)ypos < 0) ? 0 : (int)ypos);
+	pxengine.MousePosCol = pxengine.TransformMouseXtoCol(((int)xpos > PxEngine::WindowSizeY) ? (PxEngine::WindowSizeY - 1) : ((int)xpos < 0) ? 0 : (int)xpos);
+	pxengine.MousePosRow = pxengine.TransformMouseYtoRow(((int)ypos > PxEngine::WindowSizeX) ? (PxEngine::WindowSizeX - 1) : ((int)ypos < 0) ? 0 : (int)ypos);
 }
 
 void glfwmouseClickCallback(GLFWwindow* window, int button, int action, int mods)
@@ -59,16 +60,16 @@ void glfwmouseClickCallback(GLFWwindow* window, int button, int action, int mods
 	if (button == GLFW_MOUSE_BUTTON_LEFT)
 	{
 		if (GLFW_PRESS == action)
-			MouseLeftClick = true;
+			PxEngine::MouseLeftClick = true;
 		else if (GLFW_RELEASE == action)
-			MouseLeftClick = false;
+			PxEngine::MouseLeftClick = false;
 	}
 	else if (button == GLFW_MOUSE_BUTTON_RIGHT)
 	{
 		if (GLFW_PRESS == action)
-			MouseRightClick = true;
+			PxEngine::MouseRightClick = true;
 		else if (GLFW_RELEASE == action)
-			MouseRightClick = false;
+			PxEngine::MouseRightClick = false;
 	}
 }
 

@@ -5,68 +5,83 @@
 #include "../includes/glm/gtc/type_ptr.hpp"
 
 
-const int ROWS = 800;
-const int COLS = 800;
-unsigned int WindowSizeX = 800;
-unsigned int WindowSizeY = 800;
-unsigned int MousePosRow = 0;
-unsigned int MousePosCol = 0;
-bool MouseLeftClick = false;
-bool MouseRightClick = false;
-
-
-float pixelCanvas[ROWS * COLS * 3]{};
-
-
-void setPixel(float* canvas, int i, int j, float r, float g, float b)
+class PxEngine
 {
-	if (i * (COLS * 3) + j * 3 + 2 < ROWS * COLS * 3 && i * (COLS * 3) + j * 3 + 2 > 0)
+public:
+	static bool MouseLeftClick;
+	static bool MouseRightClick;
+	static unsigned int WindowSizeX;
+	static unsigned int WindowSizeY;
+	unsigned int MousePosRow = 0;
+	unsigned int MousePosCol = 0;
+	const int ROWS;
+	const int COLS;
+private:
+	float* pixelCanvas;
+public:
+	PxEngine(int rows, int cols, unsigned int WindowSizeX, unsigned int WindowSizeY)
+		:ROWS(rows), COLS(cols)
 	{
-		i = ROWS - i - 1;
-		canvas[i * (COLS * 3) + j * 3] = r;
-		canvas[i * (COLS * 3) + j * 3 + 1] = g;
-		canvas[i * (COLS * 3) + j * 3 + 2] = b;
+		this->WindowSizeX = WindowSizeX;
+		this->WindowSizeY = WindowSizeY;
+		this->MouseLeftClick = false;
+		this->MouseRightClick = false;
+		this->pixelCanvas = new float[ROWS * COLS * 3];
 	}
-}
 
-void setLine(GLfloat* pixels, int i, int j, GLfloat r, GLfloat g, GLfloat b, int end_i, int end_j, int width)
-{
-	glm::vec2 move = glm::vec2(i - end_i, j - end_j);
-	double len = glm::length(move);
-	double stepi = move.x / len;
-	double stepj = move.y / len;
-	for (int brushi = -width / 2; brushi <= width / 2; brushi++)
+	~PxEngine()
 	{
-		for (int brushj = -width / 2; brushj <= width / 2; brushj++)
+		delete[] pixelCanvas;
+	}
+
+	float* getCanvas()
+	{
+		return pixelCanvas;
+	}
+
+	void setPixel(int i, int j, float r, float g, float b)
+	{
+		if (i * (COLS * 3) + j * 3 + 2 < ROWS * COLS * 3 && i * (COLS * 3) + j * 3 + 2 > 0)
 		{
-			for (int k = 0; k < (int)ceil(len); k++)
+			i = ROWS - i - 1;
+			pixelCanvas[i * (COLS * 3) + j * 3] = r;
+			pixelCanvas[i * (COLS * 3) + j * 3 + 1] = g;
+			pixelCanvas[i * (COLS * 3) + j * 3 + 2] = b;
+		}
+	}
+
+	void setLine(int i, int j, GLfloat r, GLfloat g, GLfloat b, int end_i, int end_j, int width)
+	{
+		glm::vec2 move = glm::vec2(i - end_i, j - end_j);
+		double len = glm::length(move);
+		double stepi = move.x / len;
+		double stepj = move.y / len;
+		for (int brushi = -width / 2; brushi <= width / 2; brushi++)
+		{
+			for (int brushj = -width / 2; brushj <= width / 2; brushj++)
 			{
-				setPixel(pixels, end_i + (stepi * k) + brushi, end_j + (stepj * k) + brushj, r, g, b);
+				for (int k = 0; k < (int)ceil(len); k++)
+				{
+					setPixel(end_i + (stepi * k) + brushi, end_j + (stepj * k) + brushj, r, g, b);
+				}
 			}
 		}
 	}
-}
 
-void setAllPixels(float* canvas, int arr[ROWS][COLS], float r, float g, float b)
-{
-	for (int i = 0; i < ROWS; i++)
+	int TransformMouseXtoCol(unsigned int MousePosX)
 	{
-		for (int j = 0; j < COLS; j++)
-		{
-			setPixel(canvas, i, j, r, g, b);
-		}
+		return (float)(MousePosX % WindowSizeX) / ((float)WindowSizeX / COLS);
 	}
-}
 
-static int TransformMouseXtoCol(unsigned int MousePosX)
-{
-	return (float)(MousePosX % WindowSizeX) / ((float)WindowSizeX / COLS);
-}
-
-static int TransformMouseYtoRow(unsigned int MousePosY)
-{
-	return (float)(MousePosY % WindowSizeY) / ((float)WindowSizeY / ROWS);
-}
+	int TransformMouseYtoRow(unsigned int MousePosY)
+	{
+		return (float)(MousePosY % WindowSizeY) / ((float)WindowSizeY / ROWS);
+	}
+};
+bool PxEngine::MouseLeftClick = false;
+bool PxEngine::MouseRightClick = false;
+unsigned int PxEngine::WindowSizeX = 1;
+unsigned int PxEngine::WindowSizeY = 1;
 
 
 class PixelDraw
@@ -75,23 +90,17 @@ private:
 	float TextureOpacity;
 	unsigned int VAO;
 	unsigned int TEXTURE;
+	int ROWS;
+	int COLS;
 	glm::mat4 transform = glm::mat4(1.0f);
 public:
 	Shader shader;
 
-	unsigned int getWindowWidth()
-	{
-		return WindowSizeX;
-	}
-
-	unsigned int getWindowHeight()
-	{
-		return WindowSizeY;
-	}
-
-	PixelDraw(glm::mat4x3 bgcolor) : shader("../shaders/vertexShader.txt", "../shaders/fragmentShader.txt")
+	PixelDraw(glm::mat4x3 bgcolor, int ROWS, int COLS) : shader("../shaders/vertexShader.txt", "../shaders/fragmentShader.txt")
 	{
 		this->TextureOpacity = 0.5f;
+		this->ROWS = ROWS;
+		this->COLS = COLS;
 		genCanvas(bgcolor);
 		genTexture();
 	}
@@ -107,7 +116,7 @@ public:
 			this->TextureOpacity = value;
 	}
 
-	void draw(float *canvas)
+	void draw(float* canvas)
 	{
 		setPixelTexture(canvas);
 		shader.use();
@@ -116,7 +125,7 @@ public:
 		glBindTexture(GL_TEXTURE_2D, this->TEXTURE);
 		glBindVertexArray(this->VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		
+
 	}
 private:
 	GLuint indices[6] = {
@@ -170,7 +179,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	}
 
-	void setPixelTexture(float *canvas)
+	void setPixelTexture(float* canvas)
 	{
 		glBindTexture(GL_TEXTURE_2D, this->TEXTURE);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, COLS, ROWS, 0, GL_RGB, GL_FLOAT, canvas);

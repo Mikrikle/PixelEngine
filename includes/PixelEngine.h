@@ -16,9 +16,35 @@ public:
 	unsigned int MousePosCol = 0;
 	const int ROWS;
 	const int COLS;
+	int SIZE;
 private:
-	float* pixelCanvas;
+	float** pixelCanvases = nullptr;
+	float* mixLayerCanvas = nullptr;
+	int currentCanvas = 0;
+	int layersNum = 1;
+
+	void initCanvases()
+	{
+		pixelCanvases = new float* [layersNum];
+		for (int i = 0; i < layersNum; i++)
+		{
+			pixelCanvases[i] = new float[SIZE];
+			for (int elem = 0; elem < SIZE; elem++)
+				pixelCanvases[i][elem] = 0.0f;
+		}
+		mixLayerCanvas = new float[SIZE];
+		for (int elem = 0; elem < SIZE; elem++)
+			mixLayerCanvas[elem] = 0.0f;
+	}
+
+	void deleteCanvases()
+	{
+		for (int i = 0; i < layersNum; i++)
+			delete[] pixelCanvases[i];
+		delete[] pixelCanvases;
+	}
 public:
+
 	PxEngine(int rows, int cols, unsigned int WindowSizeX, unsigned int WindowSizeY)
 		:ROWS(rows), COLS(cols)
 	{
@@ -26,27 +52,64 @@ public:
 		this->WindowSizeY = WindowSizeY;
 		this->MouseLeftClick = false;
 		this->MouseRightClick = false;
-		this->pixelCanvas = new float[ROWS * COLS * 3];
+		this->SIZE = COLS * ROWS * 3;
+		initCanvases();
 	}
 
 	~PxEngine()
 	{
-		delete[] pixelCanvas;
+		deleteCanvases();
+		delete[] mixLayerCanvas;
+	}
+
+	void addLayer()
+	{
+		float** NewPixelCanvases = new float* [layersNum + 1];
+		for (int i = 0; i < layersNum + 1; i++)
+			NewPixelCanvases[i] = new float[SIZE];
+
+		for (int i = 0; i < layersNum; i++)
+			for (int elem = 0; elem < SIZE; elem++)
+				NewPixelCanvases[i][elem] = pixelCanvases[i][elem];
+
+		deleteCanvases();
+		layersNum++;
+		pixelCanvases = NewPixelCanvases;
+	}
+
+	int getCurrentLayer()
+	{
+		return currentCanvas;
+	}
+
+	void setLayer(int value)
+	{
+		if (value >= 0 && value < layersNum)
+			currentCanvas = value;
 	}
 
 	float* getCanvas()
 	{
-		return pixelCanvas;
+		return pixelCanvases[currentCanvas];
+	}
+
+	float* getMixLayerCanvas()
+	{
+		for (int elem = 0; elem < SIZE; elem++)
+			for (int i = 0; i < layersNum; i++)
+				if (pixelCanvases[currentCanvas][elem] > mixLayerCanvas[elem])
+					mixLayerCanvas[elem] = pixelCanvases[currentCanvas][elem];
+		return mixLayerCanvas;
 	}
 
 	void setPixel(int i, int j, float r, float g, float b)
 	{
-		if (i * (COLS * 3) + j * 3 + 2 < ROWS * COLS * 3 && i * (COLS * 3) + j * 3 + 2 > 0)
+		if (i * (COLS * 3) + j * 3 + 3 < SIZE && i * (COLS * 3) + j * 3 + 3 > 0)
 		{
 			i = ROWS - i - 1;
-			pixelCanvas[i * (COLS * 3) + j * 3] = r;
-			pixelCanvas[i * (COLS * 3) + j * 3 + 1] = g;
-			pixelCanvas[i * (COLS * 3) + j * 3 + 2] = b;
+			pixelCanvases[currentCanvas][i * (COLS * 3) + j * 3] = r;
+			pixelCanvases[currentCanvas][i * (COLS * 3) + j * 3 + 1] = g;
+			pixelCanvases[currentCanvas][i * (COLS * 3) + j * 3 + 2] = b;
 		}
 	}
 
@@ -78,6 +141,7 @@ public:
 		return (float)(MousePosY % WindowSizeY) / ((float)WindowSizeY / ROWS);
 	}
 };
+
 bool PxEngine::MouseLeftClick = false;
 bool PxEngine::MouseRightClick = false;
 unsigned int PxEngine::WindowSizeX = 1;

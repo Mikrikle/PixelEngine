@@ -8,10 +8,12 @@
 #include "../includes/glm/gtc/matrix_transform.hpp"
 #include "../includes/glm/gtc/type_ptr.hpp"
 
-#include "../includes/Engine.cpp"
-#include "../includes/useGLFM.cpp"
 
-PxEngine pxengine(50, 50, 800, 800);
+#include "../includes/useGLFM.cpp"
+#include "../includes/PixelEngine.h"
+
+int WindowWidth = 800, WindowHeight = 800;
+PxEngine pxengine(50, 50, WindowWidth, WindowHeight);
 
 int main()
 {
@@ -30,12 +32,18 @@ int main()
 		}
 
 		cvs.setOpacity(0.2f);
-		cvs.draw(pxengine.getCanvas());
+		if (PxEngine::MouseRightClick)
+		{
+			cvs.draw(pxengine.getMixLayerCanvas());
+		}
+		else
+		{
+			cvs.draw(pxengine.getCanvas());
+		}
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
 	glfwTerminate();
 	return 0;
 
@@ -82,4 +90,10 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+		pxengine.setLayer(pxengine.getCurrentLayer() + 1);
+	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+		pxengine.setLayer(pxengine.getCurrentLayer() - 1);
+	if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
+		pxengine.addLayer();
 }

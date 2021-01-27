@@ -8,7 +8,6 @@
 #include "../includes/glm/gtc/matrix_transform.hpp"
 #include "../includes/glm/gtc/type_ptr.hpp"
 
-
 #include "../includes/useGLFM.cpp"
 #include "../includes/PixelEngine.h"
 
@@ -19,7 +18,7 @@ int main()
 {
 	initGLFWwindow("Game", PxEngine::WindowSizeX, PxEngine::WindowSizeY);
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
-	PixelDraw cvs(glm::make_mat4x3(colors), pxengine.ROWS, pxengine.COLS);
+	PixelCanvasObj cvs(glm::make_mat4x3(colors), pxengine.getROWS(), pxengine.getCOLS());
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -59,8 +58,8 @@ void glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 
 void glfwmouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	pxengine.MousePosCol = pxengine.TransformMouseXtoCol(((int)xpos > PxEngine::WindowSizeY) ? (PxEngine::WindowSizeY - 1) : ((int)xpos < 0) ? 0 : (int)xpos);
-	pxengine.MousePosRow = pxengine.TransformMouseYtoRow(((int)ypos > PxEngine::WindowSizeX) ? (PxEngine::WindowSizeX - 1) : ((int)ypos < 0) ? 0 : (int)ypos);
+	pxengine.MousePosCol = pxengine.TransformMouseXtoCol((int)xpos);
+	pxengine.MousePosRow = pxengine.TransformMouseYtoRow((int)ypos);
 }
 
 void glfwmouseClickCallback(GLFWwindow* window, int button, int action, int mods)

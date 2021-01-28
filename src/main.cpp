@@ -12,7 +12,8 @@
 #include "../includes/PixelEngine.h"
 
 int WindowWidth = 800, WindowHeight = 800;
-PxEngine pxengine(50, 50, WindowWidth, WindowHeight);
+int ROWS = 80, COLS = 80;
+PxEngine pxengine(ROWS, COLS, WindowWidth, WindowHeight);
 
 int main()
 {

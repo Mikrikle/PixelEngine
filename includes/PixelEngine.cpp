@@ -142,5 +142,5 @@ int PxEngine::TransformMouseYtoRow(int MousePosY)
 	else if (MousePosY >= PxEngine::WindowSizeY)
 		return ROWS - 1;
 
-	return MousePosY / ((float)PxEngine::WindowSizeY / COLS);
+	return MousePosY / ((float)PxEngine::WindowSizeY / ROWS);
 }

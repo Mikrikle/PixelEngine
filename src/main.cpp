@@ -11,13 +11,15 @@
 #include "../includes/useGLFM.cpp"
 #include "../includes/PixelEngine.h"
 
-int WindowWidth = 800, WindowHeight = 800;
-int ROWS = 80, COLS = 80;
-PxEngine pxengine(ROWS, COLS, WindowWidth, WindowHeight);
+/* create engine with set rows, cols, window width and height*/
+PxEngine pxengine(80, 80, 800, 800);
 
 int main()
 {
+	/* create window */
 	initGLFWwindow("Game", PxEngine::WindowSizeX, PxEngine::WindowSizeY);
+
+	/* create canvas and set background color */
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
 	PixelCanvasObj cvs(glm::make_mat4x3(colors), pxengine.getROWS(), pxengine.getCOLS());
 
@@ -26,18 +28,25 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		/* example of processing the left mouse button click */
 		if (PxEngine::MouseLeftClick)
 		{
+			/* drawing in red color */
 			pxengine.setPixel(pxengine.MousePosRow, pxengine.MousePosCol, 1.0f, 0.0f, 0.0f);
 		}
+		// PxEngine::MouseLeftClick = false; uncomment to disable continuous triggering. 
 
+		/* start rendering*/
+		/* setting a semi-transparent texture for background visibility  */
 		cvs.setOpacity(0.2f);
 		if (PxEngine::MouseRightClick)
 		{
+			/* rendering all layers while the right button pressed */
 			cvs.draw(pxengine.getMixLayerCanvas());
 		}
 		else
 		{
+			/* rendering the current layer */
 			cvs.draw(pxengine.getCanvas());
 		}
 
@@ -88,8 +97,13 @@ void glfwmouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 
 void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
+	/* closing the program when you press on escape */
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+
+	/* when you press enter, a new layer is created, you can switch to it and back using the arrows, 
+	the space bar deletes the current layer. 
+	Set it up as you need it or delete */
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
 		pxengine.setLayer(pxengine.getCurrentLayer() + 1);
 	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
@@ -98,6 +112,4 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
 		pxengine.addLayer();
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 		pxengine.deleteLayer(0);
-	if (key == GLFW_KEY_W && action == GLFW_PRESS)
-		std::cout << pxengine.getCurrentLayer() << std::endl;
 }

@@ -96,4 +96,8 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
 		pxengine.setLayer(pxengine.getCurrentLayer() - 1);
 	if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
 		pxengine.addLayer();
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+		pxengine.deleteLayer(0);
+	if (key == GLFW_KEY_W && action == GLFW_PRESS)
+		std::cout << pxengine.getCurrentLayer() << std::endl;
 }

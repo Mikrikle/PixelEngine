@@ -71,6 +71,35 @@ void PxEngine::addLayer()
 	pixelCanvases = NewPixelCanvases;
 }
 
+void PxEngine::deleteLayer(int delLvlNum)
+{
+	if (layersNum < 2)
+		return;
+	if (delLvlNum == 0)
+	{
+		delLvlNum = currentCanvas - 1;
+	}
+	if (currentCanvas == delLvlNum)
+	{
+		currentCanvas = 0;
+	}
+	float** NewPixelCanvases = new float* [layersNum - 1];
+	for (int i = 0; i < layersNum - 1; i++)
+		NewPixelCanvases[i] = new float[SIZE];
+
+	for (int i = 0, k = 0; i < layersNum && k < layersNum - 1; i++, k++)
+	{
+		for (int elem = 0; elem < SIZE; elem++)
+			NewPixelCanvases[k][elem] = pixelCanvases[i][elem];
+		if (k == delLvlNum)
+			i++;
+	}
+
+	deleteCanvases();
+	layersNum--;
+	pixelCanvases = NewPixelCanvases;
+}
+
 int PxEngine::getCurrentLayer()
 {
 	return currentCanvas;

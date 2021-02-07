@@ -1,5 +1,11 @@
 # PixelEngine
 
+Engine for drawing pixel-based 2D graphics to the full window. Based on OpenGL 3.3+ and GLFW.
+
+Designed for cellular automata, drawing, and simple games.
+
+![image](https://user-images.githubusercontent.com/50238538/107142282-cc375800-693e-11eb-9116-cc84fc0111e9.png)
+
 ### how to use in Visual Studio
 
 * install cmake https://cmake.org/download/

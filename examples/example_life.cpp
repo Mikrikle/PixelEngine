@@ -1,3 +1,5 @@
+/*
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -187,3 +189,5 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 		randfillArr();
 }
+
+*/

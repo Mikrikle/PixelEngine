@@ -8,7 +8,7 @@
 #include "../includes/glm/gtc/matrix_transform.hpp"
 #include "../includes/glm/gtc/type_ptr.hpp"
 
-#include "../includes/useGLFM.cpp"
+#include "../includes/windowGLFM.h"
 #include "../includes/PixelEngine.h"
 
 /* create engine with set rows, cols, window width and height*/
@@ -17,13 +17,13 @@ PxEngine pxengine(80, 80, 800, 800);
 int main()
 {
 	/* create window */
-	initGLFWwindow("Game", PxEngine::WindowSizeX, PxEngine::WindowSizeY);
+	Window window(PxEngine::WindowSizeX, PxEngine::WindowSizeY, "Game");
 
 	/* create canvas and set background color */
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
 	PixelCanvasObj cvs(glm::make_mat4x3(colors), pxengine.getROWS(), pxengine.getCOLS());
 
-	while (!glfwWindowShouldClose(window))
+	while (!window.isShouldClose())
 	{
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -50,10 +50,9 @@ int main()
 			cvs.draw(pxengine.getCanvas());
 		}
 
-		glfwSwapBuffers(window);
+		window.swapBuffers();
 		glfwPollEvents();
 	}
-	glfwTerminate();
 	return 0;
 
 }

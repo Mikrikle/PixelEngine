@@ -11,7 +11,7 @@
 #include "../includes/glm/gtc/matrix_transform.hpp"
 #include "../includes/glm/gtc/type_ptr.hpp"
 
-#include "../includes/useGLFM.cpp"
+#include "../includes/windowGLFM.h"
 #include "../includes/PixelEngine.h"
 
 const int ROWS = 400, COLS = 400;
@@ -105,13 +105,13 @@ int main()
 {
 	srand(time(NULL));
 	randfillArr();
-	initGLFWwindow("Life", PxEngine::WindowSizeX, PxEngine::WindowSizeY);
+	Window window(PxEngine::WindowSizeX, PxEngine::WindowSizeY, "Life");
 
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
 	PixelCanvasObj cvs(glm::make_mat4x3(colors), pxengine.getROWS(), pxengine.getCOLS());
 
 	bool pause = false;
-	while (!glfwWindowShouldClose(window))
+	while (!window.isShouldClose())
 	{
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -136,10 +136,9 @@ int main()
 		cvs.setOpacity(0.2f);
 		cvs.draw(pxengine.getCanvas());
 
-		glfwSwapBuffers(window);
+		window.swapBuffers();
 		glfwPollEvents();
 	}
-	glfwTerminate();
 	return 0;
 
 }

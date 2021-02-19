@@ -31,7 +31,13 @@ void PixelCanvasObj::draw(float* canvas)
 	glBindTexture(GL_TEXTURE_2D, this->TEXTURE);
 	glBindVertexArray(this->VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	transform = glm::mat4(1.0f);
 
+}
+
+void PixelCanvasObj::setScale(float scale)
+{
+	transform = glm::scale(transform, glm::vec3(scale, scale, 1.0));
 }
 
 void PixelCanvasObj::genCanvas(glm::mat4x3 color)

@@ -99,6 +99,8 @@ public:
 	/* rendering this object */
 	void draw(float* canvas);
 
+	void setScale(float scale);
+
 private:
 	/* indexes for drawing a rectangular canvas from triangles*/
 	GLuint indices[6] = {

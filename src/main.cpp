@@ -12,7 +12,9 @@
 #include "../includes/PixelEngine.h"
 
 /* create engine with set rows, cols, window width and height*/
-PxEngine pxengine(80, 80, 800, 800);
+PxEngine pxengine(200, 200, 800, 800);
+
+float scale = 2.0f;
 
 int main()
 {
@@ -27,6 +29,9 @@ int main()
 	{
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		/* set zoom */
+		cvs.setScale(scale);
 
 		/* example of processing the left mouse button click */
 		if (PxEngine::MouseLeftClick)
@@ -67,8 +72,8 @@ void glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 
 void glfwmouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	pxengine.MousePosCol = pxengine.TransformMouseXtoCol((int)xpos);
-	pxengine.MousePosRow = pxengine.TransformMouseYtoRow((int)ypos);
+	pxengine.MousePosCol = pxengine.TransformMouseXtoCol((int)xpos / scale + PxEngine::WindowSizeX / 2.0 / scale * (scale - 1));
+	pxengine.MousePosRow = pxengine.TransformMouseYtoRow((int)ypos / scale + PxEngine::WindowSizeY / 2.0 / scale * (scale - 1));
 }
 
 void glfwmouseClickCallback(GLFWwindow* window, int button, int action, int mods)
@@ -91,7 +96,9 @@ void glfwmouseClickCallback(GLFWwindow* window, int button, int action, int mods
 
 void glfwmouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-
+	/* zoom with scrool */
+	if ((yoffset > 0 && scale < 10.0) || (yoffset < 0 && scale > 0.5))
+		scale += yoffset / 4.0f;
 }
 
 void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -100,8 +107,8 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
-	/* when you press enter, a new layer is created, you can switch to it and back using the arrows, 
-	the space bar deletes the current layer. 
+	/* when you press enter, a new layer is created, you can switch to it and back using the arrows,
+	the space bar deletes the current layer.
 	Set it up as you need it or delete */
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
 		pxengine.setLayer(pxengine.getCurrentLayer() + 1);
@@ -111,4 +118,7 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
 		pxengine.addLayer();
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 		pxengine.deleteLayer(0);
+	/* set base zoom */
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+		scale = 1.0;
 }

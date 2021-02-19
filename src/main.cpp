@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "../shaders/shader_s.h"
+#include "../shaders/shader.h"
 #include "../includes/glm/glm.hpp"
 #include "../includes/glm/gtc/matrix_transform.hpp"
 #include "../includes/glm/gtc/type_ptr.hpp"
@@ -51,7 +51,7 @@ int main()
 		}
 
 		window.swapBuffers();
-		glfwPollEvents();
+		window.poolEvents();
 	}
 	return 0;
 

@@ -6,7 +6,7 @@
 #include <iostream>
 #include <ctime>
 
-#include "../shaders/shader_s.h"
+#include "../shaders/shader.h"
 #include "../includes/glm/glm.hpp"
 #include "../includes/glm/gtc/matrix_transform.hpp"
 #include "../includes/glm/gtc/type_ptr.hpp"

@@ -44,6 +44,11 @@ void Window::swapBuffers()
 	glfwSwapBuffers(window);
 }
 
+void Window::poolEvents()
+{
+	glfwPollEvents();
+}
+
 GLFWwindow* Window::getWindow()
 {
 	return this->window;

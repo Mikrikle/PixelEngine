@@ -24,6 +24,8 @@ public:
 
 	void swapBuffers();
 
+	void poolEvents();
+
 	GLFWwindow* getWindow();
 
 };

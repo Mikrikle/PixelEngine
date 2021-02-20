@@ -17,12 +17,36 @@
 int SIZEX = 800;
 int SIZEY = SIZEX;
 PxObj px(SIZEX, SIZEY, 800, 800);
-double scale = 25.0f;
-double step = 0.01;
+double scale = 30.0f;
+double step = 0.005;
 
 double f(double x)
 {
-	return sin(x) * x;
+	return cos(sin(x) * x) * tan(x);
+}
+
+void render()
+{
+	for (int i = SIZEX/2, j= SIZEX / 2; i < SIZEX; i += scale, j-= scale)
+	{
+		px.setLine(0, i, 0.1f, 0.1f, 0.1f, SIZEY - 1, i, 1);
+		px.setLine(0, j, 0.1f, 0.1f, 0.1f, SIZEY - 1, j, 1);
+	}
+	for (int i = SIZEY/2, j = SIZEX / 2; i < SIZEY; i += scale, j-=scale)
+	{
+		px.setLine(i, 0, 0.1f, 0.1f, 0.1f, i, SIZEX - 1, 1);
+		px.setLine(j, 0, 0.1f, 0.1f, 0.1f, j, SIZEX - 1, 1);
+	}
+	px.setLine(SIZEY / 2, 0, 0.5f, 0.5f, 0.5f, SIZEY / 2, SIZEX - 1, 1);
+	px.setLine(0, SIZEX / 2, 0.5f, 0.5f, 0.5f, SIZEY - 1, SIZEX / 2, 1);
+
+	for (double x = -SIZEX / 2.0 + 1; x < SIZEX / 2.0 - 1; x += step)
+	{
+		if (!isnan(f(x)))
+		{
+			px.setPixel(SIZEY - round(f(x / scale) * scale + SIZEY / 2.0), round(x + SIZEX / 2.0), 1.0f, 0.0f, 0.0f);
+		}
+	}
 }
 
 int main()
@@ -33,16 +57,7 @@ int main()
 	px.initCanvas(glm::make_mat4x3(colors), &shader);
 
 
-	px.setLine(SIZEY / 2, 0, 0.5f, 0.5f, 0.5f, SIZEY / 2, SIZEX - 1, 1);
-	px.setLine(0, SIZEX / 2, 0.5f, 0.5f, 0.5f, SIZEY - 1, SIZEX / 2, 1);
-
-	for (double x = -SIZEX / 2.0 + 1; x < SIZEX / 2.0 - 1; x += step)
-	{
-		if (!isnan(f(x)))
-		{
-			px.setPixel(SIZEY - round(f(x/scale)*scale + SIZEY / 2.0), round(x + SIZEX / 2.0), 1.0f, 0.0f, 0.0f);
-		}
-	}
+	render();
 
 	while (!window.isShouldClose())
 	{
@@ -87,7 +102,10 @@ void PxEvents::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int ac
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+	{
 		px.setScale(1.0f);
+		px.setTranslate(0.0f, 0.0f);
+	}
 
 	if (key == GLFW_KEY_D && action == GLFW_PRESS)
 		px.increaseTranslate(-0.1, 0);
@@ -97,6 +115,20 @@ void PxEvents::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int ac
 		px.increaseTranslate(0, -0.1);
 	if (key == GLFW_KEY_S && action == GLFW_PRESS)
 		px.increaseTranslate(0, 0.1);
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+	{
+		if(scale<100)
+			scale += 5;
+		px.clear();
+		render();
+	}
+	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+	{
+		if (scale > 6)
+			scale -= 5;
+		px.clear();
+		render();
+	}
 }
 
 */

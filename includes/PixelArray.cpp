@@ -61,3 +61,9 @@ void PixelArray::setLine(int i, int j, GLfloat r, GLfloat g, GLfloat b, int end_
 		}
 	}
 }
+
+void PixelArray::clear()
+{
+	for (int i = 0; i < SIZE; i++)
+		pixelCanvas[i] = 0.0f;
+}

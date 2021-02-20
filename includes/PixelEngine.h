@@ -33,6 +33,8 @@ public:
 
 	/* allows you to set a continuous line at 2 points */
 	void setLine(int i, int j, GLfloat r, GLfloat g, GLfloat b, int end_i, int end_j, int width);
+
+	void clear();
 };
 
 
@@ -107,11 +109,8 @@ public:
 	static bool MouseRightClick;
 	int MousePosCol;
 	int MousePosRow;
-	int worldX;
-	int worldY;
 	int COLS;
 	int ROWS;
-	float worldSIZE;
 
 
 	PxObj(int ROWS, int COLS, int width, int height);

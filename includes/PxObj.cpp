@@ -13,10 +13,6 @@ PxObj::PxObj(int ROWS, int COLS, int width, int height) : PixelCanvas(ROWS, COLS
 	this->ROWS = ROWS;
 	this->MousePosCol = 0;
 	this->MousePosRow = 0;
-	this->worldX = 0;
-	this->worldY = 0;
-	this->worldSIZE = 1.0f;
-
 }
 
 void PxObj::draw()

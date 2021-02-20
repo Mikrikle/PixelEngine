@@ -5,8 +5,6 @@
 #include "../includes/glm/gtc/matrix_transform.hpp"
 #include "../includes/glm/gtc/type_ptr.hpp"
 
-class PixelCanvas;
-
 class PixelArray
 {
 private:
@@ -67,7 +65,11 @@ public:
 
 	void setScale(float scale);
 
+	void increaseScale(float value);
+
 	void setTranslate(float x, float y);
+
+	void increaseTranslate(float moveX, float moveY);
 
 	float getTx();
 

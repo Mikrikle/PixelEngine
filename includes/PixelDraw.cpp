@@ -15,8 +15,8 @@ PixelCanvas::PixelCanvas(int ROWS, int COLS)
 	this->COLS = COLS;
 	this->transform = glm::mat4(1.0f);
 	this->scale = 1.0f;
-	this->translateX = 1.0f;
-	this->translateY = 1.0f;
+	this->translateX = 0.0f;
+	this->translateY = 0.0f;
 	this->TEXTURE = 0;
 	this->VAO = 0;
 
@@ -38,6 +38,8 @@ void PixelCanvas::render(float* canvas)
 	setPixelTexture(canvas);
 	shader->use();
 	shader->setFloat("TextureOpacity", this->TextureOpacity);
+	transform = glm::scale(transform, glm::vec3(scale, scale, 1.0));
+	transform = glm::translate(transform, glm::vec3(translateX, translateY, 0.0f));
 	glUniformMatrix4fv(glGetUniformLocation(shader->ID, "transform"), 1, GL_FALSE, glm::value_ptr(transform));
 	glBindTexture(GL_TEXTURE_2D, this->TEXTURE);
 	glBindVertexArray(this->VAO);
@@ -49,7 +51,6 @@ void PixelCanvas::render(float* canvas)
 void PixelCanvas::setScale(float scale)
 {
 	this->scale = scale;
-	transform = glm::scale(transform, glm::vec3(scale, scale, 1.0));
 }
 
 float PixelCanvas::getTx()
@@ -67,11 +68,22 @@ float PixelCanvas::getScale()
 	return scale;
 }
 
+void PixelCanvas::increaseScale(float value)
+{
+	if ((value > 0 && scale < 50.0) || (value < 0 && scale > 0.1))
+		this->scale += value;
+}
+
 void PixelCanvas::setTranslate(float x, float y)
 {
 	this->translateX = x;
 	this->translateY = y;
-	transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
+}
+
+void PixelCanvas::increaseTranslate(float moveX, float moveY)
+{
+	this->translateX += moveX;
+	this->translateY += moveY;
 }
 
 void PixelCanvas::genCanvas(glm::mat4x3 color)

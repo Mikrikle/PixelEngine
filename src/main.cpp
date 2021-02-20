@@ -11,15 +11,9 @@
 #include "../includes/windowGLFM.h"
 #include "../includes/PixelEngine.h"
 
-/* create engine with set rows, cols, window width and height*/
-PxObj px(80, 80, 800, 800);
-PxObj px2(10, 10, 800, 800);
-
-float scale = 0.5f;
-float tx = 0.5f, ty = 0.5f;
-
-float scale2 = 0.5f;
-float tx2 = -0.3f, ty2 = -0.3f;
+/* create with set rows, cols, window width and height*/
+const int arrsize = 2;
+PxObj PxObjArr[arrsize] = { {80, 80, 800, 800},{10, 10, 800, 800} };
 
 int main()
 {
@@ -29,35 +23,37 @@ int main()
 	/* create canvas and set background color */
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
 	Shader shader("../shaders/vertexShader.txt", "../shaders/fragmentShader.txt");
-	px.initCanvas(glm::make_mat4x3(colors), &shader);
-	px2.initCanvas(glm::make_mat4x3(colors), &shader);
+	PxObjArr[0].initCanvas(glm::make_mat4x3(colors), &shader);
+	PxObjArr[0].setScale(0.5f);
+	PxObjArr[0].setTranslate(0.5f, 0.5f);
+	PxObjArr[1].initCanvas(glm::make_mat4x3(colors), &shader);
+	PxObjArr[1].setScale(0.4f);
+	PxObjArr[1].setTranslate(-0.3f, -0.3f);
 
 	while (!window.isShouldClose())
 	{
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		/* set zoom */
-		px.setScale(scale);
-		px.setTranslate(tx, ty);
-
-		px2.setScale(scale2);
-		px2.setTranslate(tx2, ty2);
-
 		/* example of processing the left mouse button click */
 		if (PxObj::MouseLeftClick)
 		{
-			if(px.MousePosRow >=0 && px.MousePosCol >= 0)
-				px.setPixel(px.MousePosRow, px.MousePosCol, 1.0f, 0.0f, 0.0f);
-			else
-				px2.setPixel(px2.MousePosRow, px2.MousePosCol, 1.0f, 0.0f, 0.0f);
+			for (int i = 0; i < arrsize; i++)
+			{
+				if (PxObjArr[i].MousePosRow >= 0 && PxObjArr[i].MousePosCol >= 0)
+				{
+					PxObjArr[i].setPixel(PxObjArr[i].MousePosRow, PxObjArr[i].MousePosCol, 1.0f, 0.0f, 0.0f);
+					break;
+				}
+			}
+
 		}
 
-		px2.setOpacity(0.5f);
-		px2.draw();
-
-		px.setOpacity(0.2f);
-		px.draw();
+		for (int i = arrsize-1; i >= 0; i--)
+		{
+			PxObjArr[i].setOpacity(0.2f);
+			PxObjArr[i].draw();
+		}
 
 
 		window.swapBuffers();
@@ -77,10 +73,11 @@ void PxEvents::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 
 void PxEvents::glfwmouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	px.TransformMouseXtoCol((int)xpos);
-	px.TransformMouseYtoRow((int)ypos);
-	px2.TransformMouseXtoCol((int)xpos);
-	px2.TransformMouseYtoRow((int)ypos);
+	for (int i = 0; i < arrsize; i++)
+	{
+		PxObjArr[i].TransformMouseXtoCol((int)xpos);
+		PxObjArr[i].TransformMouseYtoRow((int)ypos);
+	}
 }
 
 void PxEvents::glfwmouseClickCallback(GLFWwindow* window, int button, int action, int mods)
@@ -104,8 +101,8 @@ void PxEvents::glfwmouseClickCallback(GLFWwindow* window, int button, int action
 void PxEvents::glfwmouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	/* zoom with scrool */
-	if ((yoffset > 0 && scale < 10.0) || (yoffset < 0 && scale > 0.5))
-		scale += yoffset / 4.0f;
+	if ((yoffset > 0 && PxObjArr[0].getScale() < 10.0) || (yoffset < 0 && PxObjArr[0].getScale() > 0.4))
+		PxObjArr[0].increaseScale(yoffset / 4.0f);
 }
 
 void PxEvents::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -116,15 +113,15 @@ void PxEvents::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int ac
 
 	/* set base zoom */
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-		scale = 1.0;
+		PxObjArr[0].setScale(1.0f);
 
 	/* set pos */
 	if (key == GLFW_KEY_D && action == GLFW_PRESS)
-		tx += 0.1;
+		PxObjArr[0].increaseTranslate(0.1, 0);
 	if (key == GLFW_KEY_A && action == GLFW_PRESS)
-		tx -= 0.1;
+		PxObjArr[0].increaseTranslate(-0.1, 0);
 	if (key == GLFW_KEY_W && action == GLFW_PRESS)
-		ty += 0.1;
+		PxObjArr[0].increaseTranslate(0, 0.1);
 	if (key == GLFW_KEY_S && action == GLFW_PRESS)
-		ty -= 0.1;
+		PxObjArr[0].increaseTranslate(0, -0.1);
 }

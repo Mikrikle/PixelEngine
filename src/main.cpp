@@ -12,18 +12,25 @@
 #include "../includes/PixelEngine.h"
 
 /* create engine with set rows, cols, window width and height*/
-PxEngine pxengine(200, 200, 800, 800);
+PxObj px(80, 80, 800, 800);
+PxObj px2(10, 10, 800, 800);
 
-float scale = 2.0f;
+float scale = 0.5f;
+float tx = 0.5f, ty = 0.5f;
+
+float scale2 = 0.5f;
+float tx2 = -0.3f, ty2 = -0.3f;
 
 int main()
 {
 	/* create window */
-	Window window(PxEngine::WindowSizeX, PxEngine::WindowSizeY, "Game");
+	Window window(PxObj::WindowSizeX, PxObj::WindowSizeY, "Game");
 
 	/* create canvas and set background color */
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
-	PixelCanvasObj cvs(glm::make_mat4x3(colors), pxengine.getROWS(), pxengine.getCOLS());
+	Shader shader("../shaders/vertexShader.txt", "../shaders/fragmentShader.txt");
+	px.initCanvas(glm::make_mat4x3(colors), &shader);
+	px2.initCanvas(glm::make_mat4x3(colors), &shader);
 
 	while (!window.isShouldClose())
 	{
@@ -31,29 +38,27 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		/* set zoom */
-		cvs.setScale(scale);
+		px.setScale(scale);
+		px.setTranslate(tx, ty);
+
+		px2.setScale(scale2);
+		px2.setTranslate(tx2, ty2);
 
 		/* example of processing the left mouse button click */
-		if (PxEngine::MouseLeftClick)
+		if (PxObj::MouseLeftClick)
 		{
-			/* drawing in red color */
-			pxengine.setPixel(pxengine.MousePosRow, pxengine.MousePosCol, 1.0f, 0.0f, 0.0f);
+			if(px.MousePosRow >=0 && px.MousePosCol >= 0)
+				px.setPixel(px.MousePosRow, px.MousePosCol, 1.0f, 0.0f, 0.0f);
+			else
+				px2.setPixel(px2.MousePosRow, px2.MousePosCol, 1.0f, 0.0f, 0.0f);
 		}
-		// PxEngine::MouseLeftClick = false; uncomment to disable continuous triggering. 
 
-		/* start rendering*/
-		/* setting a semi-transparent texture for background visibility  */
-		cvs.setOpacity(0.2f);
-		if (PxEngine::MouseRightClick)
-		{
-			/* rendering all layers while the right button pressed */
-			cvs.draw(pxengine.getMixLayerCanvas());
-		}
-		else
-		{
-			/* rendering the current layer */
-			cvs.draw(pxengine.getCanvas());
-		}
+		px2.setOpacity(0.5f);
+		px2.draw();
+
+		px.setOpacity(0.2f);
+		px.draw();
+
 
 		window.swapBuffers();
 		window.poolEvents();
@@ -63,62 +68,63 @@ int main()
 }
 
 
-void glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
+void PxEvents::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
-	PxEngine::WindowSizeX = width;
-	PxEngine::WindowSizeY = height;
+	PxObj::WindowSizeX = width;
+	PxObj::WindowSizeY = height;
 	glViewport(0, 0, width, height);
 }
 
-void glfwmouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
+void PxEvents::glfwmouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	pxengine.MousePosCol = pxengine.TransformMouseXtoCol((int)xpos / scale + PxEngine::WindowSizeX / 2.0 / scale * (scale - 1));
-	pxengine.MousePosRow = pxengine.TransformMouseYtoRow((int)ypos / scale + PxEngine::WindowSizeY / 2.0 / scale * (scale - 1));
+	px.TransformMouseXtoCol((int)xpos);
+	px.TransformMouseYtoRow((int)ypos);
+	px2.TransformMouseXtoCol((int)xpos);
+	px2.TransformMouseYtoRow((int)ypos);
 }
 
-void glfwmouseClickCallback(GLFWwindow* window, int button, int action, int mods)
+void PxEvents::glfwmouseClickCallback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT)
 	{
 		if (GLFW_PRESS == action)
-			PxEngine::MouseLeftClick = true;
+			PxObj::MouseLeftClick = true;
 		else if (GLFW_RELEASE == action)
-			PxEngine::MouseLeftClick = false;
+			PxObj::MouseLeftClick = false;
 	}
 	else if (button == GLFW_MOUSE_BUTTON_RIGHT)
 	{
 		if (GLFW_PRESS == action)
-			PxEngine::MouseRightClick = true;
+			PxObj::MouseRightClick = true;
 		else if (GLFW_RELEASE == action)
-			PxEngine::MouseRightClick = false;
+			PxObj::MouseRightClick = false;
 	}
 }
 
-void glfwmouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+void PxEvents::glfwmouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	/* zoom with scrool */
 	if ((yoffset > 0 && scale < 10.0) || (yoffset < 0 && scale > 0.5))
 		scale += yoffset / 4.0f;
 }
 
-void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
+void PxEvents::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
 	/* closing the program when you press on escape */
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
-	/* when you press enter, a new layer is created, you can switch to it and back using the arrows,
-	the space bar deletes the current layer.
-	Set it up as you need it or delete */
-	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
-		pxengine.setLayer(pxengine.getCurrentLayer() + 1);
-	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
-		pxengine.setLayer(pxengine.getCurrentLayer() - 1);
-	if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
-		pxengine.addLayer();
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-		pxengine.deleteLayer(0);
 	/* set base zoom */
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 		scale = 1.0;
+
+	/* set pos */
+	if (key == GLFW_KEY_D && action == GLFW_PRESS)
+		tx += 0.1;
+	if (key == GLFW_KEY_A && action == GLFW_PRESS)
+		tx -= 0.1;
+	if (key == GLFW_KEY_W && action == GLFW_PRESS)
+		ty += 0.1;
+	if (key == GLFW_KEY_S && action == GLFW_PRESS)
+		ty -= 0.1;
 }

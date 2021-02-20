@@ -15,7 +15,7 @@
 #include "../includes/PixelEngine.h"
 
 const int ROWS = 400, COLS = 400;
-PxEngine pxengine(ROWS, COLS, 800, 800);
+PixelArray pxengine(ROWS, COLS, 800, 800);
 
 enum Cells
 {
@@ -105,10 +105,10 @@ int main()
 {
 	srand(time(NULL));
 	randfillArr();
-	Window window(PxEngine::WindowSizeX, PxEngine::WindowSizeY, "Life");
+	Window window(PixelArray::WindowSizeX, PixelArray::WindowSizeY, "Life");
 
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
-	PixelCanvasObj cvs(glm::make_mat4x3(colors), pxengine.getROWS(), pxengine.getCOLS());
+	PixelCanvas cvs(glm::make_mat4x3(colors), pxengine.getROWS(), pxengine.getCOLS());
 
 	bool pause = false;
 	while (!window.isShouldClose())
@@ -122,16 +122,16 @@ int main()
 		}
 
 		
-		if (PxEngine::MouseLeftClick)
+		if (PixelArray::MouseLeftClick)
 		{
 			arr[pxengine.MousePosRow][pxengine.MousePosCol] = GREEN;
 			pxengine.setPixel(pxengine.MousePosRow, pxengine.MousePosCol, 0.0f, 1.0f, 0.0f);
 		}
-		if (PxEngine::MouseRightClick)
+		if (PixelArray::MouseRightClick)
 		{
 			pause = !pause;
 		}
-		PxEngine::MouseRightClick = false;
+		PixelArray::MouseRightClick = false;
 
 		cvs.setOpacity(0.2f);
 		cvs.draw(pxengine.getCanvas());
@@ -146,8 +146,8 @@ int main()
 
 void glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
-	PxEngine::WindowSizeX = width;
-	PxEngine::WindowSizeY = height;
+	PixelArray::WindowSizeX = width;
+	PixelArray::WindowSizeY = height;
 	glViewport(0, 0, width, height);
 }
 
@@ -162,16 +162,16 @@ void glfwmouseClickCallback(GLFWwindow* window, int button, int action, int mods
 	if (button == GLFW_MOUSE_BUTTON_LEFT)
 	{
 		if (GLFW_PRESS == action)
-			PxEngine::MouseLeftClick = true;
+			PixelArray::MouseLeftClick = true;
 		else if (GLFW_RELEASE == action)
-			PxEngine::MouseLeftClick = false;
+			PixelArray::MouseLeftClick = false;
 	}
 	else if (button == GLFW_MOUSE_BUTTON_RIGHT)
 	{
 		if (GLFW_PRESS == action)
-			PxEngine::MouseRightClick = true;
+			PixelArray::MouseRightClick = true;
 		else if (GLFW_RELEASE == action)
-			PxEngine::MouseRightClick = false;
+			PixelArray::MouseRightClick = false;
 	}
 }
 

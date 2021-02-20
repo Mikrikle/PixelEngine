@@ -17,7 +17,7 @@
 int SIZEX = 800;
 int SIZEY = SIZEX;
 float scale = 1.0f;
-PxEngine pxengine(SIZEY, SIZEX, 800, 800);
+PixelArray pxengine(SIZEY, SIZEX, 800, 800);
 
 
 
@@ -28,10 +28,10 @@ double f(double x)
 
 int main()
 {
-	Window window(PxEngine::WindowSizeX, PxEngine::WindowSizeY, "functions");
+	Window window(PixelArray::WindowSizeX, PixelArray::WindowSizeY, "functions");
 
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
-	PixelCanvasObj cvs(glm::make_mat4x3(colors), pxengine.getROWS(), pxengine.getCOLS());
+	PixelCanvas cvs(glm::make_mat4x3(colors), pxengine.getROWS(), pxengine.getCOLS());
 
 
 	pxengine.setLine(SIZEY / 2, 0, 0.5f, 0.5f, 0.5f, SIZEY / 2, SIZEX - 1, 1);

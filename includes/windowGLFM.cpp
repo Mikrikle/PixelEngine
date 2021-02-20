@@ -8,11 +8,11 @@ Window::Window(int WIDTH, int HEIGHT, const char* title)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	this->window = glfwCreateWindow(WIDTH, HEIGHT, title, NULL, NULL);
 
-	glfwSetWindowSizeCallback(window, glfwWindowSizeCallback);
-	glfwSetCursorPosCallback(window, glfwmouseMoveCallback);
-	glfwSetMouseButtonCallback(window, glfwmouseClickCallback);
-	glfwSetScrollCallback(window, glfwmouseScrollCallback);
-	glfwSetKeyCallback(window, glfwKeyCallback);
+	glfwSetWindowSizeCallback(window, PxEvents::glfwWindowSizeCallback);
+	glfwSetCursorPosCallback(window, PxEvents::glfwmouseMoveCallback);
+	glfwSetMouseButtonCallback(window, PxEvents::glfwmouseClickCallback);
+	glfwSetScrollCallback(window, PxEvents::glfwmouseScrollCallback);
+	glfwSetKeyCallback(window, PxEvents::glfwKeyCallback);
 
 	if (window == nullptr)
 	{

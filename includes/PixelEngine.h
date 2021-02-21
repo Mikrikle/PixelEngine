@@ -49,13 +49,18 @@ private:
 	float scale;
 	float translateX;
 	float translateY;
+	float WIDTH;
+	float HEIGHT;
+	glm::vec2 nullPos;
 	glm::mat4 transform;
 	Shader* shader;
+
+	void normilizeNullCoords();
 public:
 
 	void initCanvas(glm::mat4x3 bgcolor, Shader* shader);
 
-	PixelCanvas(int ROWS, int COLS);
+	PixelCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT);
 
 	~PixelCanvas();
 
@@ -78,6 +83,12 @@ public:
 	float getTy();
 
 	float getScale();
+
+	float getWIDTH();
+
+	float getHEIGHT();
+
+	glm::vec2 PixelCanvas::getNullPos();
 
 private:
 	/* indexes for drawing a rectangular canvas from triangles*/
@@ -112,12 +123,10 @@ public:
 	int COLS;
 	int ROWS;
 
-
-	PxObj(int ROWS, int COLS, int width, int height);
+	PxObj(int ROWS, int COLS, int WindowWSizeX, int WindowSizeY, float width, float height);
 
 	void draw();
 
-	void TransformMouseXtoCol(int x);
-	void TransformMouseYtoRow(int y);
+	void PxObj::TransformMouseXtoGrid(int x, int y);
 
 };

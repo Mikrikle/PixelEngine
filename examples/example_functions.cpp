@@ -16,7 +16,7 @@
 
 int SIZEX = 800;
 int SIZEY = SIZEX;
-PxObj px(SIZEX, SIZEY, 800, 800);
+PxObj px(SIZEX, SIZEY, 800, 800, 2.0f, 2.0f);
 double scale = 30.0f;
 double step = 0.005;
 

@@ -5,10 +5,10 @@ int PxObj::WindowSizeY = 0;
 bool PxObj::MouseLeftClick = false;
 bool PxObj::MouseRightClick = false;
 
-PxObj::PxObj(int ROWS, int COLS, int width, int height) : PixelCanvas(ROWS, COLS), PixelArray(ROWS, COLS)
+PxObj::PxObj(int ROWS, int COLS, int WindowWSizeX, int WindowSizeY, float WIDTH, float HEIGHT) : PixelCanvas(ROWS, COLS, WIDTH, HEIGHT), PixelArray(ROWS, COLS)
 {
-	PxObj::WindowSizeX = width;
-	PxObj::WindowSizeY = height;
+	PxObj::WindowSizeX = WindowWSizeX;
+	PxObj::WindowSizeY = WindowSizeY;
 	this->COLS = COLS;
 	this->ROWS = ROWS;
 	this->MousePosCol = 0;
@@ -20,22 +20,22 @@ void PxObj::draw()
 	render(getCanvas());
 }
 
-void PxObj::TransformMouseXtoCol(int x)
+void PxObj::TransformMouseXtoGrid(int x, int y)
 {
-	int realMousePos = x / getScale() + PxObj::WindowSizeX / 2.0 / getScale() * ((double)getScale() - 1) - (PxObj::WindowSizeX / 2.0 * getTx());
-	int col = realMousePos / ((float)PxObj::WindowSizeX / COLS);
-	if (col >= 0 && col < COLS)
-		this->MousePosCol = col;
+	glm::vec2 absoluteMousePos = glm::vec2((x / ((float)PxObj::WindowSizeX / 2.0f)) - 1.0f, (((float)PxObj::WindowSizeY - y) / ((float)PxObj::WindowSizeY / 2)) - 1.0f);
+	float realX = getNullPos().x - (getScale() - 1) * getWIDTH() / 2;
+	float realY = getNullPos().y - (getScale() - 1) * getHEIGHT() / 2;
+
+	if (absoluteMousePos.x > realX && absoluteMousePos.x < realX + getWIDTH()*getScale() &&
+		absoluteMousePos.y > realY && absoluteMousePos.y < realY + getHEIGHT() * getScale())
+	{
+		MousePosCol = (absoluteMousePos.x - realX) * COLS / (getWIDTH()*getScale());
+		MousePosRow = ROWS - ((absoluteMousePos.y - realY) * ROWS / (getHEIGHT()*getScale()));
+	}
 	else
-		this->MousePosCol = -1;
+	{
+		MousePosCol = -1;
+		MousePosRow = -1;
+	}
 }
 
-void PxObj::TransformMouseYtoRow(int y)
-{
-	int realMousePos = y / getScale() + PxObj::WindowSizeY / 2.0 / getScale() * ((double)getScale() - 1) + (PxObj::WindowSizeY / 2.0 * getTy());
-	int row = realMousePos / ((float)PxObj::WindowSizeY / ROWS);
-	if (row >= 0 && row < ROWS)
-		this->MousePosRow = row;
-	else
-		this->MousePosRow = -1;
-}

@@ -15,7 +15,7 @@
 #include "../includes/PixelEngine.h"
 
 const int ROWS = 400, COLS = 400;
-PxObj px(ROWS, COLS, 800, 800);
+PxObj px(ROWS, COLS, 800, 800, 2.0f, 2.0f);
 
 enum Cells
 {
@@ -152,8 +152,7 @@ void PxEvents::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 
 void PxEvents::glfwmouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	px.TransformMouseXtoCol((int)xpos);
-	px.TransformMouseYtoRow((int)ypos);
+	px.TransformMouseXtoGrid((int)xpos, (int)ypos);
 }
 
 void PxEvents::glfwmouseClickCallback(GLFWwindow* window, int button, int action, int mods)

@@ -7,7 +7,7 @@ void PixelCanvas::initCanvas(glm::mat4x3 bgcolor, Shader* shader)
 	genTexture();
 }
 
-PixelCanvas::PixelCanvas(int ROWS, int COLS)
+PixelCanvas::PixelCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT)
 {
 	this->shader = nullptr;
 	this->TextureOpacity = 0.5f;
@@ -19,7 +19,9 @@ PixelCanvas::PixelCanvas(int ROWS, int COLS)
 	this->translateY = 0.0f;
 	this->TEXTURE = 0;
 	this->VAO = 0;
-
+	this->WIDTH = WIDTH;
+	this->HEIGHT = HEIGHT;
+	this->nullPos = glm::vec2(-WIDTH/2.0f, -HEIGHT/2.0f);
 }
 
 PixelCanvas::~PixelCanvas()
@@ -35,23 +37,24 @@ void PixelCanvas::setOpacity(float value)
 
 void PixelCanvas::render(float* canvas)
 {
+	transform = glm::mat4(1.0f);
 	setPixelTexture(canvas);
 	shader->use();
 	shader->setFloat("TextureOpacity", this->TextureOpacity);
-	transform = glm::scale(transform, glm::vec3(scale, scale, 1.0));
 	transform = glm::translate(transform, glm::vec3(translateX, translateY, 0.0f));
+	transform = glm::scale(transform, glm::vec3(scale, scale, 1.0));
 	glUniformMatrix4fv(glGetUniformLocation(shader->ID, "transform"), 1, GL_FALSE, glm::value_ptr(transform));
 	glBindTexture(GL_TEXTURE_2D, this->TEXTURE);
 	glBindVertexArray(this->VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	transform = glm::mat4(1.0f);
-
+	glBindVertexArray(0);
 }
 
-void PixelCanvas::setScale(float scale)
+void PixelCanvas::normilizeNullCoords()
 {
-	this->scale = scale;
+	nullPos = glm::vec2(round(nullPos.x * 100) / 100, round(nullPos.y * 100) / 100);
 }
+
 
 float PixelCanvas::getTx()
 {
@@ -68,6 +71,11 @@ float PixelCanvas::getScale()
 	return scale;
 }
 
+void PixelCanvas::setScale(float scale)
+{
+	this->scale = scale;
+}
+
 void PixelCanvas::increaseScale(float value)
 {
 	if ((value > 0 && scale < 50.0) || (value < 0 && scale > 0.1))
@@ -76,23 +84,42 @@ void PixelCanvas::increaseScale(float value)
 
 void PixelCanvas::setTranslate(float x, float y)
 {
+	nullPos = glm::vec2(-WIDTH / 2.0f + x, -HEIGHT / 2.0f + y);
 	this->translateX = x;
 	this->translateY = y;
+	normilizeNullCoords();
 }
 
 void PixelCanvas::increaseTranslate(float moveX, float moveY)
 {
+	nullPos = glm::vec2(nullPos.x += moveX, nullPos.y+=moveY);
 	this->translateX += moveX;
 	this->translateY += moveY;
+	normilizeNullCoords();
+}
+
+float PixelCanvas::getWIDTH()
+{
+	return WIDTH;
+}
+
+float PixelCanvas::getHEIGHT()
+{
+	return HEIGHT;
+}
+
+glm::vec2 PixelCanvas::getNullPos()
+{
+	return nullPos;
 }
 
 void PixelCanvas::genCanvas(glm::mat4x3 color)
 {
 	GLfloat vertices[] = {
-		1.0f,  1.0f, 0.0f,   color[0].x, color[0].y, color[0].z, 1.0f, 1.0f,
-		1.0f, -1.0f, 0.0f,   color[1].x, color[1].y, color[1].z, 1.0f, 0.0f,
-	   -1.0f, -1.0f, 0.0f,   color[2].x, color[2].y, color[2].z, 0.0f, 0.0f,
-	   -1.0f,  1.0f, 0.0f,   color[3].x, color[3].y, color[3].z, 0.0f, 1.0f,
+		WIDTH /2.0,  HEIGHT / 2.0, 0.0f,   color[0].x, color[0].y, color[0].z, 1.0f, 1.0f,
+		WIDTH / 2.0, -HEIGHT / 2.0, 0.0f,   color[1].x, color[1].y, color[1].z, 1.0f, 0.0f,
+	   -WIDTH / 2.0, -HEIGHT / 2.0, 0.0f,   color[2].x, color[2].y, color[2].z, 0.0f, 0.0f,
+	   -WIDTH / 2.0,  HEIGHT / 2.0, 0.0f,   color[3].x, color[3].y, color[3].z, 0.0f, 1.0f,
 	};
 	genBuffers(vertices, sizeof(vertices), indices, sizeof(indices));
 }

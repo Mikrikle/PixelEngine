@@ -100,7 +100,7 @@ namespace glm
 			static_cast<T>(0));
 
 		// Translate and scale the picked region to the entire window
-		Result = translate(Result, Temp);
+		Result = translatePos(Result, Temp);
 		return scale(Result, vec<3, T, Q>(static_cast<T>(viewport[2]) / delta.x, static_cast<T>(viewport[3]) / delta.y, static_cast<T>(1)));
 	}
 }//namespace glm

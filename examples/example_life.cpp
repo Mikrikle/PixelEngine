@@ -15,7 +15,7 @@
 #include "../includes/PixelEngine.h"
 
 const int ROWS = 400, COLS = 400;
-PxObj px(ROWS, COLS, 800, 800, 2.0f, 2.0f);
+PxObj px(ROWS, COLS, 1.0f, 1.0f, 800, 800);
 
 enum Cells
 {

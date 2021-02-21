@@ -11,8 +11,13 @@
 #include "../includes/windowGLFM.h"
 #include "../includes/PixelEngine.h"
 
-/* create with set rows, cols, window width and height*/
-PxObj px(100, 200, 800, 800, 1.0f, 0.5f);
+
+/* create main object */
+/*       rows, cols, width, height, windowWidth, windowHeight*/
+PxObj px(100, 200, 1.0f, 0.75f, 1000, 800);
+/*		the window size is set once */
+PxObj topPanel(1, 1, 1.0f, 0.25f);
+
 
 int main()
 {
@@ -22,9 +27,12 @@ int main()
 	/* create canvas and set background color */
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
 	Shader shader("../shaders/vertexShader.txt", "../shaders/fragmentShader.txt");
-	px.initCanvas(glm::make_mat4x3(colors), &shader);
-	px.setScale(1.0f);
-	px.setTranslate(0.5f, 0.2f);
+	/* fast canvas init                              scale, X-offset, Y-offset */
+	px.initCanvas(glm::make_mat4x3(colors), &shader, 1.0f, 0.0f, -0.25f);
+
+	float topPanelColor[12]{ 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,  0.0f, 0.0f, 0.0f };
+	float colorChangeValue = 0.01f;
+	topPanel.initCanvas(glm::make_mat4x3(topPanelColor), &shader, 1.0f, 0.0f, 0.75f);
 
 	while (!window.isShouldClose())
 	{
@@ -36,9 +44,28 @@ int main()
 		{
 			px.setPixel(px.MousePosRow, px.MousePosCol, 1.0f, 0.0f, 0.0f);
 		}
-		
+		/* example of processing the right mouse button click */
+		if (PxObj::MouseRightClick)
+		{
+			px.setPixel(px.MousePosRow, px.MousePosCol, 0.0f, 0.0f, 0.0f);
+		}
+
+		/* example of change color */
+		for (int i = 0; i < 13; i+=11)
+		{
+			if (topPanelColor[i] >= 0.9f || topPanelColor[i] <= -0.1f)
+				colorChangeValue = -colorChangeValue;
+			topPanelColor[i] += colorChangeValue;
+		}
+		topPanel.changeBackground(glm::make_mat4x3(topPanelColor));
+
+		/* setting the transparency of the texture relative to the background color */
 		px.setOpacity(0.2f);
 		px.draw();
+
+		/* fully transparent texture */
+		topPanel.setOpacity(1.0f);
+		topPanel.draw();
 
 		window.swapBuffers();
 		window.poolEvents();
@@ -97,11 +124,11 @@ void PxEvents::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int ac
 
 	/* set pos */
 	if (key == GLFW_KEY_D && action == GLFW_PRESS)
-		px.increaseTranslate(0.1, 0);
+		px.increaseTranslate(0.1f, 0.0f);
 	if (key == GLFW_KEY_A && action == GLFW_PRESS)
-		px.increaseTranslate(-0.1, 0);
+		px.increaseTranslate(-0.1f, 0.0f);
 	if (key == GLFW_KEY_W && action == GLFW_PRESS)
-		px.increaseTranslate(0, 0.1);
+		px.increaseTranslate(0.0f, 0.1f);
 	if (key == GLFW_KEY_S && action == GLFW_PRESS)
-		px.increaseTranslate(0, -0.1);
+		px.increaseTranslate(0.0f, -0.1f);
 }

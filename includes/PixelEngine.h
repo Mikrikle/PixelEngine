@@ -5,6 +5,12 @@
 #include "../includes/glm/gtc/matrix_transform.hpp"
 #include "../includes/glm/gtc/type_ptr.hpp"
 
+typedef struct
+{
+	float x;
+	float y;
+} PxCoord;
+
 class PixelArray
 {
 private:
@@ -47,12 +53,11 @@ private:
 	int ROWS;
 	int COLS;
 	float scale;
-	float translateX;
-	float translateY;
 	float WIDTH;
 	float HEIGHT;
-	glm::vec2 nullPos;
 	glm::mat4 transform;
+	PxCoord translatePos;
+	PxCoord nullPos;
 	Shader* shader;
 
 	void normilizeNullCoords();
@@ -60,9 +65,13 @@ public:
 
 	void initCanvas(glm::mat4x3 bgcolor, Shader* shader);
 
+	void initCanvas(glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY);
+
 	PixelCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT);
 
 	~PixelCanvas();
+
+	void changeBackground(glm::mat4x3 color);
 
 	/* set the transparency of the texture, the higher, the more transparent, recomended value 0.2f */
 	void setOpacity(float value);
@@ -78,17 +87,13 @@ public:
 
 	void increaseTranslate(float moveX, float moveY);
 
-	float getTx();
-
-	float getTy();
-
 	float getScale();
 
 	float getWIDTH();
 
 	float getHEIGHT();
 
-	glm::vec2 PixelCanvas::getNullPos();
+	PxCoord PixelCanvas::getNullPos();
 
 private:
 	/* indexes for drawing a rectangular canvas from triangles*/
@@ -123,10 +128,12 @@ public:
 	int COLS;
 	int ROWS;
 
-	PxObj(int ROWS, int COLS, int WindowWSizeX, int WindowSizeY, float width, float height);
+	PxObj(int ROWS, int COLS, float WIDTH, float HEIGHT, int WindowSizeX, int WindowSizeY);
+
+	PxObj(int ROWS, int COLS, float WIDTH, float HEIGHT);
 
 	void draw();
 
-	void PxObj::TransformMouseXtoGrid(int x, int y);
+	void TransformMouseXtoGrid(int x, int y);
 
 };

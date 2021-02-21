@@ -5,10 +5,15 @@ int PxObj::WindowSizeY = 0;
 bool PxObj::MouseLeftClick = false;
 bool PxObj::MouseRightClick = false;
 
-PxObj::PxObj(int ROWS, int COLS, int WindowWSizeX, int WindowSizeY, float WIDTH, float HEIGHT) : PixelCanvas(ROWS, COLS, WIDTH, HEIGHT), PixelArray(ROWS, COLS)
+
+PxObj::PxObj(int ROWS, int COLS, float WIDTH, float HEIGHT, int WindowSizeX, int WindowSizeY) : PxObj::PxObj(ROWS, COLS, WIDTH, HEIGHT)
 {
-	PxObj::WindowSizeX = WindowWSizeX;
+	PxObj::WindowSizeX = WindowSizeX;
 	PxObj::WindowSizeY = WindowSizeY;
+}
+
+PxObj::PxObj(int ROWS, int COLS, float WIDTH, float HEIGHT) : PixelCanvas(ROWS, COLS, WIDTH, HEIGHT), PixelArray(ROWS, COLS)
+{
 	this->COLS = COLS;
 	this->ROWS = ROWS;
 	this->MousePosCol = 0;
@@ -26,11 +31,11 @@ void PxObj::TransformMouseXtoGrid(int x, int y)
 	float realX = getNullPos().x - (getScale() - 1) * getWIDTH() / 2;
 	float realY = getNullPos().y - (getScale() - 1) * getHEIGHT() / 2;
 
-	if (absoluteMousePos.x > realX && absoluteMousePos.x < realX + getWIDTH()*getScale() &&
+	if (absoluteMousePos.x > realX && absoluteMousePos.x < realX + getWIDTH() * getScale() &&
 		absoluteMousePos.y > realY && absoluteMousePos.y < realY + getHEIGHT() * getScale())
 	{
-		MousePosCol = (absoluteMousePos.x - realX) * COLS / (getWIDTH()*getScale());
-		MousePosRow = ROWS - ((absoluteMousePos.y - realY) * ROWS / (getHEIGHT()*getScale()));
+		MousePosCol = (absoluteMousePos.x - realX) * COLS / (getWIDTH() * getScale());
+		MousePosRow = ROWS - ((absoluteMousePos.y - realY) * ROWS / (getHEIGHT() * getScale()));
 	}
 	else
 	{

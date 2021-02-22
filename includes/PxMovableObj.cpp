@@ -5,6 +5,8 @@ PxMovableObj::PxMovableObj(float WIDTH, float HEIGHT) : PxBaseObj(WIDTH, HEIGHT)
 	this->scale = 1.0f;
 	this->nullPos = PxCoord{ -WIDTH / 2.0f, -HEIGHT / 2.0f };
 	this->translatePos = PxCoord{ 0.0f , 0.0f };
+	this->absoluteMousePos = PxCoord{ -1.0f , -1.0f };
+	this->realPos = PxCoord{ nullPos.x - (scale - 1) * WIDTH / 2 , nullPos.y - (scale - 1) * HEIGHT / 2 };
 }
 
 PxCoord PxMovableObj::getNullPos()
@@ -46,4 +48,17 @@ void PxMovableObj::increaseTranslate(float moveX, float moveY)
 	translatePos.x += moveX;
 	translatePos.y += moveY;
 	normilizeNullCoords();
+}
+
+bool PxMovableObj::isClickOn(int x, int y)
+{
+	absoluteMousePos = PxCoord{ (x / ((float)Px::WindowSizeX / 2.0f)) - 1.0f, (((float)Px::WindowSizeY - y) / ((float)Px::WindowSizeY / 2)) - 1.0f };
+	realPos = PxCoord{ nullPos.x - (scale - 1) * WIDTH / 2 , nullPos.y - (scale - 1) * HEIGHT / 2 };
+
+	if (absoluteMousePos.x > realPos.x && absoluteMousePos.x < realPos.x + WIDTH * scale &&
+		absoluteMousePos.y > realPos.y && absoluteMousePos.y < realPos.y + HEIGHT * scale)
+	{
+		return true;
+	}
+	return false;
 }

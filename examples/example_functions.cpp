@@ -51,7 +51,7 @@ void render()
 
 int main()
 {
-	Window window(PixelCanvas::WindowSizeX, PixelCanvas::WindowSizeY, "Game");
+	Window window(Px::WindowSizeX, Px::WindowSizeY, "Game");
 	Shader shader("../shaders/vertexShader.txt", "../shaders/fragmentShader.txt");
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
 	px.initCanvas(glm::make_mat4x3(colors), &shader);
@@ -77,8 +77,8 @@ int main()
 
 void PxEvents::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
-	PixelCanvas::WindowSizeX = width;
-	PixelCanvas::WindowSizeY = height;
+	Px::WindowSizeX = width;
+	Px::WindowSizeY = height;
 	glViewport(0, 0, width, height);
 }
 

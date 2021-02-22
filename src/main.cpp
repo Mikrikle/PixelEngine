@@ -22,7 +22,7 @@ PixelCanvas topPanel(1, 1, 1.0f, 0.25f);
 int main()
 {
 	/* create window */
-	Window window(PixelCanvas::WindowSizeX, PixelCanvas::WindowSizeY, "Game");
+	Window window(Px::WindowSizeX, Px::WindowSizeY, "Game");
 
 	/* create canvas and set background color */
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
@@ -40,12 +40,12 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		/* example of processing the left mouse button click */
-		if (PixelCanvas::MouseLeftClick)
+		if (Px::MouseLeftClick)
 		{
 			px.setPixel(px.MousePosRow, px.MousePosCol, 1.0f, 0.0f, 0.0f);
 		}
 		/* example of processing the right mouse button click */
-		if (PixelCanvas::MouseRightClick)
+		if (Px::MouseRightClick)
 		{
 			px.setPixel(px.MousePosRow, px.MousePosCol, 0.0f, 0.0f, 0.0f);
 		}
@@ -77,8 +77,8 @@ int main()
 
 void PxEvents::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
-	PixelCanvas::WindowSizeX = width;
-	PixelCanvas::WindowSizeY = height;
+	Px::WindowSizeX = width;
+	Px::WindowSizeY = height;
 	glViewport(0, 0, width, height);
 }
 
@@ -92,16 +92,16 @@ void PxEvents::glfwmouseClickCallback(GLFWwindow* window, int button, int action
 	if (button == GLFW_MOUSE_BUTTON_LEFT)
 	{
 		if (GLFW_PRESS == action)
-			PixelCanvas::MouseLeftClick = true;
+			Px::MouseLeftClick = true;
 		else if (GLFW_RELEASE == action)
-			PixelCanvas::MouseLeftClick = false;
+			Px::MouseLeftClick = false;
 	}
 	else if (button == GLFW_MOUSE_BUTTON_RIGHT)
 	{
 		if (GLFW_PRESS == action)
-			PixelCanvas::MouseRightClick = true;
+			Px::MouseRightClick = true;
 		else if (GLFW_RELEASE == action)
-			PixelCanvas::MouseRightClick = false;
+			Px::MouseRightClick = false;
 	}
 }
 

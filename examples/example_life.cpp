@@ -104,7 +104,7 @@ int main()
 {
 	srand(time(NULL));
 	randfillArr();
-	Window window(PixelCanvas::WindowSizeX, PixelCanvas::WindowSizeY, "Game");
+	Window window(Px::WindowSizeX, Px::WindowSizeY, "Game");
 	Shader shader("../shaders/vertexShader.txt", "../shaders/fragmentShader.txt");
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
 	px.initCanvas(glm::make_mat4x3(colors), &shader);
@@ -121,7 +121,7 @@ int main()
 		}
 
 		
-		if (PixelCanvas::MouseLeftClick)
+		if (Px::MouseLeftClick)
 		{
 			arr[px.MousePosRow][px.MousePosCol] = GREEN;
 			px.setPixel(px.MousePosRow, px.MousePosCol, 0.0f, 1.0f, 0.0f);
@@ -130,7 +130,7 @@ int main()
 		{
 			pause = !pause;
 		}
-		PixelCanvas::MouseRightClick = false;
+		Px::MouseRightClick = false;
 
 		px.setOpacity(0.2f);
 		px.draw();
@@ -160,16 +160,16 @@ void PxEvents::glfwmouseClickCallback(GLFWwindow* window, int button, int action
 	if (button == GLFW_MOUSE_BUTTON_LEFT)
 	{
 		if (GLFW_PRESS == action)
-			PixelCanvas::MouseLeftClick = true;
+			Px::MouseLeftClick = true;
 		else if (GLFW_RELEASE == action)
-			PixelCanvas::MouseLeftClick = false;
+			Px::MouseLeftClick = false;
 	}
 	else if (button == GLFW_MOUSE_BUTTON_RIGHT)
 	{
 		if (GLFW_PRESS == action)
-			PixelCanvas::MouseRightClick = true;
+			Px::MouseRightClick = true;
 		else if (GLFW_RELEASE == action)
-			PixelCanvas::MouseRightClick = false;
+			Px::MouseRightClick = false;
 	}
 }
 

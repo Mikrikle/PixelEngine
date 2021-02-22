@@ -1,6 +1,5 @@
 #include "../includes/PixelEngine.h"
 
-
 void PxCanvasObj::initCanvas(glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY)
 {
 	initCanvas(bgcolor, shader);
@@ -26,12 +25,17 @@ PxCanvasObj::PxCanvasObj(int ROWS, int COLS, float WIDTH, float HEIGHT) : PxMova
 	this->VAO = 0;
 	this->WIDTH = WIDTH * 2.0;
 	this->HEIGHT = HEIGHT * 2.0;
+	this->SIZE = COLS * ROWS * 3;
+	this->pixelCanvas = new float[SIZE];
+	for (int elem = 0; elem < SIZE; elem++)
+		this->pixelCanvas[elem] = 0.0f;
 
 }
 
 PxCanvasObj::~PxCanvasObj()
 {
 	glDeleteVertexArrays(1, &this->VAO);
+	delete[] pixelCanvas;
 }
 
 void PxCanvasObj::changeBackground(glm::mat4x3 color)
@@ -45,10 +49,10 @@ void PxCanvasObj::setOpacity(float value)
 		this->TextureOpacity = value;
 }
 
-void PxCanvasObj::render(float* pixelArray)
+void PxCanvasObj::render()
 {
 	transform = glm::mat4(1.0f);
-	setPixelTexture(pixelArray);
+	setPixelTexture();
 	shader->use();
 	shader->setFloat("TextureOpacity", this->TextureOpacity);
 	transform = glm::translatePos(transform, glm::vec3(translatePos.x, translatePos.y, 0.0f));
@@ -58,16 +62,6 @@ void PxCanvasObj::render(float* pixelArray)
 	glBindVertexArray(this->VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
-}
-
-float PxCanvasObj::getWIDTH()
-{
-	return WIDTH;
-}
-
-float PxCanvasObj::getHEIGHT()
-{
-	return HEIGHT;
 }
 
 void PxCanvasObj::genCanvas(glm::mat4x3 color)
@@ -116,8 +110,56 @@ void PxCanvasObj::genTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 }
 
-void PxCanvasObj::setPixelTexture(float* pixelArray)
+void PxCanvasObj::setPixelTexture()
 {
 	glBindTexture(GL_TEXTURE_2D, this->TEXTURE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, COLS, ROWS, 0, GL_RGB, GL_FLOAT, pixelArray);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, COLS, ROWS, 0, GL_RGB, GL_FLOAT, this->pixelCanvas);
+}
+
+int PxCanvasObj::getROWS()
+{
+	return ROWS;
+}
+
+int PxCanvasObj::getCOLS()
+{
+	return COLS;
+}
+
+void PxCanvasObj::setPixel(int i, int j, float r, float g, float b)
+{
+	if (i >= 0 && j >= 0)
+	{
+		if (i * (COLS * 3) + j * 3 + 3 <= SIZE && i * (COLS * 3) + j * 3 + 3 >= 0)
+		{
+			i = ROWS - i - 1;
+			pixelCanvas[i * (COLS * 3) + j * 3] = r;
+			pixelCanvas[i * (COLS * 3) + j * 3 + 1] = g;
+			pixelCanvas[i * (COLS * 3) + j * 3 + 2] = b;
+		}
+	}
+}
+
+void PxCanvasObj::setLine(int i, int j, GLfloat r, GLfloat g, GLfloat b, int end_i, int end_j, int width)
+{
+	glm::vec2 move = glm::vec2(i - end_i, j - end_j);
+	double len = glm::length(move);
+	double stepi = move.x / len;
+	double stepj = move.y / len;
+	for (int brushi = -width / 2; brushi <= width / 2; brushi++)
+	{
+		for (int brushj = -width / 2; brushj <= width / 2; brushj++)
+		{
+			for (int k = 0; k < (int)ceil(len); k++)
+			{
+				setPixel(end_i + (stepi * k) + brushi, end_j + (stepj * k) + brushj, r, g, b);
+			}
+		}
+	}
+}
+
+void PxCanvasObj::clear()
+{
+	for (int i = 0; i < SIZE; i++)
+		pixelCanvas[i] = 0.0f;
 }

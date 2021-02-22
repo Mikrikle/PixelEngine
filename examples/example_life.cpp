@@ -15,7 +15,7 @@
 #include "../includes/PixelEngine.h"
 
 const int ROWS = 400, COLS = 400;
-PxObj px(ROWS, COLS, 1.0f, 1.0f, 800, 800);
+PixelCanvas px(ROWS, COLS, 1.0f, 1.0f, 800, 800);
 
 enum Cells
 {
@@ -104,7 +104,7 @@ int main()
 {
 	srand(time(NULL));
 	randfillArr();
-	Window window(PxObj::WindowSizeX, PxObj::WindowSizeY, "Game");
+	Window window(PixelCanvas::WindowSizeX, PixelCanvas::WindowSizeY, "Game");
 	Shader shader("../shaders/vertexShader.txt", "../shaders/fragmentShader.txt");
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
 	px.initCanvas(glm::make_mat4x3(colors), &shader);
@@ -121,16 +121,16 @@ int main()
 		}
 
 		
-		if (PxObj::MouseLeftClick)
+		if (PixelCanvas::MouseLeftClick)
 		{
 			arr[px.MousePosRow][px.MousePosCol] = GREEN;
 			px.setPixel(px.MousePosRow, px.MousePosCol, 0.0f, 1.0f, 0.0f);
 		}
-		if (PxObj::MouseRightClick)
+		if (PixelCanvas::MouseRightClick)
 		{
 			pause = !pause;
 		}
-		PxObj::MouseRightClick = false;
+		PixelCanvas::MouseRightClick = false;
 
 		px.setOpacity(0.2f);
 		px.draw();
@@ -145,14 +145,14 @@ int main()
 
 void PxEvents::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
-	PxObj::WindowSizeX = width;
-	PxObj::WindowSizeY = height;
+	PixelCanvas::WindowSizeX = width;
+	PixelCanvas::WindowSizeY = height;
 	glViewport(0, 0, width, height);
 }
 
 void PxEvents::glfwmouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	px.TransformMouseXtoGrid((int)xpos, (int)ypos);
+	px.TransformMousePosToGrid((int)xpos, (int)ypos);
 }
 
 void PxEvents::glfwmouseClickCallback(GLFWwindow* window, int button, int action, int mods)
@@ -160,16 +160,16 @@ void PxEvents::glfwmouseClickCallback(GLFWwindow* window, int button, int action
 	if (button == GLFW_MOUSE_BUTTON_LEFT)
 	{
 		if (GLFW_PRESS == action)
-			PxObj::MouseLeftClick = true;
+			PixelCanvas::MouseLeftClick = true;
 		else if (GLFW_RELEASE == action)
-			PxObj::MouseLeftClick = false;
+			PixelCanvas::MouseLeftClick = false;
 	}
 	else if (button == GLFW_MOUSE_BUTTON_RIGHT)
 	{
 		if (GLFW_PRESS == action)
-			PxObj::MouseRightClick = true;
+			PixelCanvas::MouseRightClick = true;
 		else if (GLFW_RELEASE == action)
-			PxObj::MouseRightClick = false;
+			PixelCanvas::MouseRightClick = false;
 	}
 }
 

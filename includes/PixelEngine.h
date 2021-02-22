@@ -11,6 +11,7 @@ typedef struct
 	float y;
 } PxCoord;
 
+/* class for working with a 2D texture made of pixels */
 class PixelArray
 {
 private:
@@ -40,11 +41,53 @@ public:
 	/* allows you to set a continuous line at 2 points */
 	void setLine(int i, int j, GLfloat r, GLfloat g, GLfloat b, int end_i, int end_j, int width);
 
+	/* set all pixels to 0.0f */
 	void clear();
 };
 
+/* each object must have a width and a height */
+class PxBaseObj
+{
+public:
+	float WIDTH;
+	float HEIGHT;
+protected:
+	PxBaseObj(float WIDTH, float HEIGHT);
+};
 
-class PixelCanvas
+/* class for working with the position of the object on the window */
+class PxMovableObj : public PxBaseObj
+{
+public:
+	float scale;
+	PxCoord translatePos;
+	PxCoord nullPos;
+
+	/* truncates the position value to 2 decimal places */
+	void normilizeNullCoords();
+
+	/* sets the zoom level of the object */
+	void setScale(float scale);
+
+	float getScale();
+
+	/* add a value to the current scale */
+	void increaseScale(float value);
+
+	/* sets the position of the object relative to its middle */
+	void setTranslate(float x, float y);
+
+	/* add a value to the current position */
+	void increaseTranslate(float moveX, float moveY);
+
+	/* get the position of the lower left corner */
+	PxCoord getNullPos();
+protected:
+	PxMovableObj(float WIDTH, float HEIGHT);
+};
+
+/* object with a pixel-changing texture and a gradient background */
+class PxCanvasObj : public PxMovableObj
 {
 private:
 	float TextureOpacity;
@@ -52,48 +95,32 @@ private:
 	unsigned int TEXTURE;
 	int ROWS;
 	int COLS;
-	float scale;
-	float WIDTH;
-	float HEIGHT;
 	glm::mat4 transform;
-	PxCoord translatePos;
-	PxCoord nullPos;
 	Shader* shader;
 
-	void normilizeNullCoords();
 public:
-
+	/* setting the background and shader for drawing an object. full window size */
 	void initCanvas(glm::mat4x3 bgcolor, Shader* shader);
 
+	/* setting the background and shader for drawing an object also scale and position */
 	void initCanvas(glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY);
 
-	PixelCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT);
+	PxCanvasObj(int ROWS, int COLS, float WIDTH, float HEIGHT);
 
-	~PixelCanvas();
+	~PxCanvasObj();
 
+	/* changes the background, with 3 values (R G B) for each of the 4 points. Starting from the top left point by clockwise direction */
 	void changeBackground(glm::mat4x3 color);
 
 	/* set the transparency of the texture, the higher, the more transparent, recomended value 0.2f */
 	void setOpacity(float value);
 
 	/* rendering this object */
-	void render(float* canvas);
-
-	void setScale(float scale);
-
-	void increaseScale(float value);
-
-	void setTranslate(float x, float y);
-
-	void increaseTranslate(float moveX, float moveY);
-
-	float getScale();
+	void render(float* pixelArray);
 
 	float getWIDTH();
 
 	float getHEIGHT();
-
-	PxCoord PixelCanvas::getNullPos();
 
 private:
 	/* indexes for drawing a rectangular canvas from triangles*/
@@ -112,11 +139,11 @@ private:
 	void genTexture();
 
 	/* sets an array of pixels as a texture */
-	void setPixelTexture(float* canvas);
+	void setPixelTexture(float* pixelArray);
 };
 
-
-class PxObj : public PixelCanvas, public PixelArray
+/* the main class consisting of an array of pixels and a canvas for displaying them */
+class PixelCanvas : public PxCanvasObj, public PixelArray
 {
 public:
 	static int WindowSizeX;
@@ -128,12 +155,12 @@ public:
 	int COLS;
 	int ROWS;
 
-	PxObj(int ROWS, int COLS, float WIDTH, float HEIGHT, int WindowSizeX, int WindowSizeY);
+	PixelCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, int WindowSizeX, int WindowSizeY);
 
-	PxObj(int ROWS, int COLS, float WIDTH, float HEIGHT);
+	PixelCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT);
 
 	void draw();
 
-	void TransformMouseXtoGrid(int x, int y);
-
+	/* changes the values of variables MousePosCol and MousePosRow to the corresponding values*/
+	void TransformMousePosToGrid(int x, int y);
 };

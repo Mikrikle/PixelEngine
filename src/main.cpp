@@ -14,15 +14,15 @@
 
 /* create main object */
 /*       rows, cols, width, height, windowWidth, windowHeight*/
-PxObj px(100, 200, 1.0f, 0.75f, 1000, 800);
+PixelCanvas px(100, 200, 1.0f, 0.75f, 1000, 800);
 /*		the window size is set once */
-PxObj topPanel(1, 1, 1.0f, 0.25f);
+PixelCanvas topPanel(1, 1, 1.0f, 0.25f);
 
 
 int main()
 {
 	/* create window */
-	Window window(PxObj::WindowSizeX, PxObj::WindowSizeY, "Game");
+	Window window(PixelCanvas::WindowSizeX, PixelCanvas::WindowSizeY, "Game");
 
 	/* create canvas and set background color */
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
@@ -40,18 +40,18 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		/* example of processing the left mouse button click */
-		if (PxObj::MouseLeftClick)
+		if (PixelCanvas::MouseLeftClick)
 		{
 			px.setPixel(px.MousePosRow, px.MousePosCol, 1.0f, 0.0f, 0.0f);
 		}
 		/* example of processing the right mouse button click */
-		if (PxObj::MouseRightClick)
+		if (PixelCanvas::MouseRightClick)
 		{
 			px.setPixel(px.MousePosRow, px.MousePosCol, 0.0f, 0.0f, 0.0f);
 		}
 
 		/* example of change color */
-		for (int i = 0; i < 13; i+=11)
+		for (int i = 0; i < 12; i+=1)
 		{
 			if (topPanelColor[i] >= 0.9f || topPanelColor[i] <= -0.1f)
 				colorChangeValue = -colorChangeValue;
@@ -77,14 +77,14 @@ int main()
 
 void PxEvents::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
-	PxObj::WindowSizeX = width;
-	PxObj::WindowSizeY = height;
+	PixelCanvas::WindowSizeX = width;
+	PixelCanvas::WindowSizeY = height;
 	glViewport(0, 0, width, height);
 }
 
 void PxEvents::glfwmouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	px.TransformMouseXtoGrid((int)xpos, (int)ypos);
+	px.TransformMousePosToGrid((int)xpos, (int)ypos);
 }
 
 void PxEvents::glfwmouseClickCallback(GLFWwindow* window, int button, int action, int mods)
@@ -92,16 +92,16 @@ void PxEvents::glfwmouseClickCallback(GLFWwindow* window, int button, int action
 	if (button == GLFW_MOUSE_BUTTON_LEFT)
 	{
 		if (GLFW_PRESS == action)
-			PxObj::MouseLeftClick = true;
+			PixelCanvas::MouseLeftClick = true;
 		else if (GLFW_RELEASE == action)
-			PxObj::MouseLeftClick = false;
+			PixelCanvas::MouseLeftClick = false;
 	}
 	else if (button == GLFW_MOUSE_BUTTON_RIGHT)
 	{
 		if (GLFW_PRESS == action)
-			PxObj::MouseRightClick = true;
+			PixelCanvas::MouseRightClick = true;
 		else if (GLFW_RELEASE == action)
-			PxObj::MouseRightClick = false;
+			PixelCanvas::MouseRightClick = false;
 	}
 }
 

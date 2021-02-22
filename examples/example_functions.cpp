@@ -16,7 +16,7 @@
 
 int SIZEX = 800;
 int SIZEY = SIZEX;
-PxObj px(SIZEX, SIZEY, 1.0f, 1.0f, 800, 800);
+PixelCanvas px(SIZEX, SIZEY, 1.0f, 1.0f, 800, 800);
 double scale = 30.0f;
 double step = 0.005;
 
@@ -51,7 +51,7 @@ void render()
 
 int main()
 {
-	Window window(PxObj::WindowSizeX, PxObj::WindowSizeY, "Game");
+	Window window(PixelCanvas::WindowSizeX, PixelCanvas::WindowSizeY, "Game");
 	Shader shader("../shaders/vertexShader.txt", "../shaders/fragmentShader.txt");
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
 	px.initCanvas(glm::make_mat4x3(colors), &shader);
@@ -77,8 +77,8 @@ int main()
 
 void PxEvents::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
-	PxObj::WindowSizeX = width;
-	PxObj::WindowSizeY = height;
+	PixelCanvas::WindowSizeX = width;
+	PixelCanvas::WindowSizeY = height;
 	glViewport(0, 0, width, height);
 }
 

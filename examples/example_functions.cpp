@@ -16,7 +16,7 @@
 
 int SIZEX = 800;
 int SIZEY = SIZEX;
-PixelCanvas px(SIZEX, SIZEY, 1.0f, 1.0f, 800, 800);
+PxPixelCanvas px(SIZEX, SIZEY, 1.0f, 1.0f, 800, 800);
 double scale = 30.0f;
 double step = 0.005;
 

@@ -15,7 +15,7 @@
 #include "../includes/PixelEngine.h"
 
 const int ROWS = 400, COLS = 400;
-PixelCanvas px(ROWS, COLS, 1.0f, 1.0f, 800, 800);
+PxPixelCanvas px(ROWS, COLS, 1.0f, 1.0f, 800, 800);
 
 enum Cells
 {
@@ -126,7 +126,7 @@ int main()
 			arr[px.MousePosRow][px.MousePosCol] = GREEN;
 			px.setPixel(px.MousePosRow, px.MousePosCol, 0.0f, 1.0f, 0.0f);
 		}
-		if (PixelCanvas::MouseRightClick)
+		if (PxPixelCanvas::MouseRightClick)
 		{
 			pause = !pause;
 		}
@@ -145,8 +145,8 @@ int main()
 
 void PxEvents::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
 {
-	PixelCanvas::WindowSizeX = width;
-	PixelCanvas::WindowSizeY = height;
+	PxPixelCanvas::WindowSizeX = width;
+	PxPixelCanvas::WindowSizeY = height;
 	glViewport(0, 0, width, height);
 }
 

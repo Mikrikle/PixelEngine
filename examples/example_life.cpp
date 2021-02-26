@@ -15,7 +15,6 @@
 #include "../includes/PixelEngine.h"
 
 const int ROWS = 400, COLS = 400;
-PxPixelCanvas px(ROWS, COLS, 1.0f, 1.0f, 800, 800);
 
 enum Cells
 {
@@ -86,105 +85,104 @@ void update()
 			}
 		}
 	}
-
-	for (int i = 0; i < ROWS; i++)
-	{
-		for (int j = 0; j < COLS; j++)
-		{
-			if (arr[i][j] == GREEN)
-				px.setPixel(i, j, 0.0f, 1.0f, 0.0f);
-			else
-				px.setPixel(i, j, 0.0f, 0.0f, 0.0f);
-		}
-	}
 }
 
+Px::EventsDefaultManager pxmanager;
+
+bool pause = false;
+void btn_pause_clbk()
+{
+	pause = !pause;
+}
+
+void btn_restrat_clbk()
+{
+	randfillArr();
+}
+
+void event_px_on_click(Px::PxCanvas& self)
+{
+	if (Px::MouseLeftClick)
+	{
+		arr[self.getMouseRow()][self.getMouseCol()] = GREEN;
+		self.setPixel(0.0f, 1.0f, 0.0f);
+	}
+	if (Px::MouseRightClick)
+	{
+		arr[self.getMouseRow()][self.getMouseCol()] = DIED;
+		self.setPixel(0.0f, 0.0f, 0.0f);
+	}
+	
+}
+
+void event_px_scroll(Px::PxCanvas& self)
+{
+	if ((self.getScale() > 1.0f && Px::ScrollY < 0) || (self.getScale() <= 5.0f && Px::ScrollY > 0))
+		self.increaseScale(Px::ScrollY / 4.0f);
+	if (self.getScale() < 1.0f)
+		self.setScale(1.0f);
+	Px::ScrollY = 0;
+}
 
 int main()
 {
+	Px::WindowSizeX = 800;
+	Px::WindowSizeY = 800;
 	srand(time(NULL));
 	randfillArr();
 	Window window(Px::WindowSizeX, Px::WindowSizeY, "Game");
 	Shader shader("../shaders/vertexShader.txt", "../shaders/fragmentShader.txt");
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
-	px.initCanvas(glm::make_mat4x3(colors), &shader);
+	Px::PxCanvas px(ROWS, COLS, 1.0f, 1.0f, glm::make_mat4x3(colors), &shader, 1.0f, 0.0f, 0.0f, event_px_on_click, event_px_scroll, nullptr);
 
-	bool pause = false;
+	float btn_pause_colors[6]{ 0.0f, 0.0f, 0.8f, 0.0f, 0.0f, 0.6f };
+	Px::PxButton btn_pause(0.04f, 0.04f, glm::make_mat2x3(btn_pause_colors), &shader, 1.0f, 0.9f, 0.9f, btn_pause_clbk);
+
+	float btn_restart_colors[6]{ 0.0f, 1.0f, 0.8f, 0.0f, 0.5f, 0.6f };
+	Px::PxButton btn_restrat(0.04f, 0.04f, glm::make_mat2x3(btn_restart_colors), &shader, 1.0f, 0.8f, 0.9f, btn_restrat_clbk);
+
+	pxmanager.appendObj(px);
+	pxmanager.appendObj(btn_pause);
+	pxmanager.appendObj(btn_restrat);
+
+	float deltaTime = 0.0f;
+	float lastFrame = 0.0f;
 	while (!window.isShouldClose())
 	{
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		window.clearWindow(0.2f, 0.3f, 0.3f);
+
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
 
 		if (!pause)
 		{
+			for (int i = 0; i < ROWS; i++)
+			{
+				for (int j = 0; j < COLS; j++)
+				{
+					if (arr[i][j] == GREEN)
+						px.setPixel(i, j, 0.0f, 1.0f, 0.0f);
+					else
+						px.setPixel(i, j, 0.0f, 0.0f, 0.0f);
+				}
+			}
+
 			update();
 		}
 
-		
-		if (Px::MouseLeftClick)
-		{
-			arr[px.MousePosRow][px.MousePosCol] = GREEN;
-			px.setPixel(px.MousePosRow, px.MousePosCol, 0.0f, 1.0f, 0.0f);
-		}
-		if (PxPixelCanvas::MouseRightClick)
-		{
-			pause = !pause;
-		}
-		Px::MouseRightClick = false;
-
 		px.setOpacity(0.2f);
 		px.draw();
+		btn_pause.draw();
+		btn_restrat.draw();
 
 		window.swapBuffers();
 		glfwPollEvents();
+		pxmanager.updateEvents(deltaTime);
 	}
 	return 0;
 
 }
 
-
-void PxEvents::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
-{
-	PxPixelCanvas::WindowSizeX = width;
-	PxPixelCanvas::WindowSizeY = height;
-	glViewport(0, 0, width, height);
-}
-
-void PxEvents::glfwmouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
-{
-	px.TransformMousePosToGrid((int)xpos, (int)ypos);
-}
-
-void PxEvents::glfwmouseClickCallback(GLFWwindow* window, int button, int action, int mods)
-{
-	if (button == GLFW_MOUSE_BUTTON_LEFT)
-	{
-		if (GLFW_PRESS == action)
-			Px::MouseLeftClick = true;
-		else if (GLFW_RELEASE == action)
-			Px::MouseLeftClick = false;
-	}
-	else if (button == GLFW_MOUSE_BUTTON_RIGHT)
-	{
-		if (GLFW_PRESS == action)
-			Px::MouseRightClick = true;
-		else if (GLFW_RELEASE == action)
-			Px::MouseRightClick = false;
-	}
-}
-
-void PxEvents::glfwmouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
-{
-
-}
-
-void PxEvents::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
-{
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
-
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-		randfillArr();
-}
-
 */
+

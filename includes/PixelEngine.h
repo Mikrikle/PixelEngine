@@ -7,8 +7,6 @@
 
 namespace Px
 {
-	enum MovingType{STATIC, MOVABLE, SCALED, FULL};
-
 	typedef struct
 	{
 		float x;
@@ -25,19 +23,22 @@ namespace Px
 	extern float ScrollY;
 	extern bool Keys[1024];
 
+
 	class ComponentEvents
 	{
 	public:
-		float moveSpeed;
-		int baseMoveMod;
-
 		void setMoveSpeed(float value);
-		void setMovable(int value);
+
 		virtual void eventProcessing(float deltaTime) {};
 
+		float getMoveSpeed();
+
 	protected:
+		float moveSpeed;
+
 		ComponentEvents();
 	};
+
 
 	class EventsDefaultManager
 	{
@@ -51,29 +52,43 @@ namespace Px
 		void appendObj(ComponentEvents& obj);
 	};
 
-	class VAOrectangle
+	class VAOrectangleComponent
 	{
 	public:
 		void setOpacity(float value);
-
 	protected:
 		float TextureOpacity;
 		unsigned int VAO;
 		unsigned int TEXTURE;
+		int indicesSize;
 		Shader* shader;
-		GLuint indices[6] = {
+
+		VAOrectangleComponent();
+		~VAOrectangleComponent();
+		virtual void drawVAO() = 0;
+		void genBuffers(GLfloat* vertices, GLuint sizeV, GLuint* indices, GLuint sizeI);
+		void genTexture();
+	};
+
+	class VAOrectangle : public VAOrectangleComponent
+	{
+	protected:
+		GLuint indices2triangles[6] = {
 			0, 1, 3,
 			1, 2, 3
 		};
 
-		VAOrectangle();
-		~VAOrectangle();
-		void genBackground(glm::mat4x3 color, float WIDTH, float HEIGHT);
-		void genBuffers(GLfloat* vertices, GLuint sizeV, GLuint* indices, GLuint sizeI);
-		void genTexture();
-		void drawVAO();
-	};
+		GLuint indices4triangles[12] = {
+			0, 4, 3,
+			0, 4, 1,
+			3, 4, 2,
+			1, 4, 2,
+		};
 
+		void genVAO(glm::mat4x3 color, float WIDTH, float HEIGHT, int indicesSize);
+		void genVAO(glm::mat2x3 color, float WIDTH, float HEIGHT, int indicesSize);
+		void drawVAO() override;
+	};
 
 	class ComponentBase
 	{
@@ -117,10 +132,13 @@ namespace Px
 	class PxCanvas : public ComponentMovable, public VAOrectangle, public ComponentEvents
 	{
 	public:
-		PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader);
-		PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY);
+		PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY,
+			void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime));
+		PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY,
+			void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime));
 		~PxCanvas();
 		void changeBackground(glm::mat4x3 color);
+		void changeBackground(glm::mat2x3 color);
 		void setPixel(int i, int j, float r, float g, float b);
 		void setPixel(float r, float g, float b);
 		void setLine(int i, int j, GLfloat r, GLfloat g, GLfloat b, int end_i, int end_j, int width);
@@ -129,6 +147,8 @@ namespace Px
 		void eventProcessing(float deltaTime) override;
 		int getROWS();
 		int getCOLS();
+		int getMouseCol();
+		int getMouseRow();
 
 	private:
 		int ROWS;
@@ -138,6 +158,12 @@ namespace Px
 		int MousePosCol;
 		int MousePosRow;
 
+		void (*event_click)(PxCanvas& self);
+		void (*event_scrool)(PxCanvas& self);
+		void (*event_keyboard)(PxCanvas& self, float deltaTime);
+
+		PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, Shader* shader,
+			void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime));
 		void setPixelTexture();
 	};
 
@@ -146,22 +172,44 @@ namespace Px
 	{
 	public:
 		PxStaticBackground(glm::mat4x3 color, Shader* shader);
+		PxStaticBackground(glm::mat2x3 color, Shader* shader);
 		void changeBackground(glm::mat4x3 color);
+		void changeBackground(glm::mat2x3 color);
 		void draw();
 	};
 
 
-	class PxButton : public ComponentMovable, public VAOrectangle, public ComponentEvents
+	template <typename T>
+	class PxButtonForObj : public ComponentMovable, public VAOrectangle, public ComponentEvents
 	{
 	public:
-		PxButton(float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)(ComponentMovable& obj), ComponentMovable& obj);
+		PxButtonForObj(float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)(T& obj), T& obj);
+		PxButtonForObj(float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)(T& obj), T& obj);
 		void changeBackground(glm::mat4x3 color);
+		void changeBackground(glm::mat2x3 color);
 		void draw();
 		void eventProcessing(float deltaTime) override;
 
 	private:
-		void (*btncallback)(ComponentMovable& obj);
-		ComponentMovable* bindObj;
+		PxButtonForObj(float WIDTH, float HEIGHT, Shader* shader, float scale, float posX, float posY, void (*btncallback)(T& obj), T& obj);
+		void (*btncallback)(T& obj);
+		T* bindObj;
 	};
 
+#include "../includes/PxButtonForObj.ini";
+
+	class PxButton : public ComponentMovable, public VAOrectangle, public ComponentEvents
+	{
+	public:
+		PxButton(float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)());
+		PxButton(float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)());
+		void changeBackground(glm::mat4x3 color);
+		void changeBackground(glm::mat2x3 color);
+		void draw();
+		void eventProcessing(float deltaTime) override;
+
+	private:
+		PxButton(float WIDTH, float HEIGHT, Shader* shader, float scale, float posX, float posY, void (*btncallback)());
+		void (*btncallback)();
+	};
 }

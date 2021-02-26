@@ -20,6 +20,8 @@ public:
 
 	void poolEvents();
 
+	void clearWindow(float r, float g, float b);
+
 	GLFWwindow* getWindow();
 
 };

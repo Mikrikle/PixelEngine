@@ -1,23 +1,43 @@
 #include "PixelEngine.h"
 using namespace Px;
 
-PxButton::PxButton(float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)(ComponentMovable& obj), ComponentMovable& obj)
-	: ComponentMovable(WIDTH, HEIGHT)
+
+PxButton::PxButton(float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)())
+	: PxButton(WIDTH, HEIGHT, shader, scale, posX, posY, btncallback)
 {
-	this->bindObj = &obj;
+	genVAO(bgcolor, this->WIDTH, this->HEIGHT, 6);
+}
+
+
+PxButton::PxButton(float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)())
+	: PxButton(WIDTH, HEIGHT, shader, scale, posX, posY, btncallback)
+{
+	genVAO(bgcolor, this->WIDTH, this->HEIGHT, 12);
+}
+
+
+PxButton::PxButton(float WIDTH, float HEIGHT, Shader* shader, float scale, float posX, float posY, void (*btncallback)())
+	: ComponentMovable(WIDTH * 2, HEIGHT * 2)
+{
 	this->shader = shader;
-	genBackground(bgcolor, WIDTH*2.0, HEIGHT*2.0);
 	genTexture();
 	setScale(scale);
 	setTranslate(posX, posY);
 	this->btncallback = btncallback;
-	
 }
+
 
 void PxButton::changeBackground(glm::mat4x3 color)
 {
-	genBackground(color, WIDTH, HEIGHT);
+	genVAO(color, WIDTH, HEIGHT, 6);
 }
+
+
+void PxButton::changeBackground(glm::mat2x3 color)
+{
+	genVAO(color, WIDTH, HEIGHT, 12);
+}
+
 
 void PxButton::draw()
 {
@@ -30,11 +50,12 @@ void PxButton::draw()
 	drawVAO();
 }
 
+
 void PxButton::eventProcessing(float deltaTime)
 {
 	if (isClickOn(Px::MousePosX, Px::MousePosY) && Px::MouseLeftClick)
 	{
-		btncallback(*bindObj);
+		btncallback();
 		Px::MouseLeftClick = false;
 	}
 }

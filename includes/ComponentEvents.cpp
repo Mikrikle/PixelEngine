@@ -10,14 +10,12 @@ void ComponentEvents::setMoveSpeed(float value)
 		this->moveSpeed = value;
 }
 
-void ComponentEvents::setMovable(int value)
+float ComponentEvents::getMoveSpeed()
 {
-	if (value >= 0 && value <= FULL)
-		baseMoveMod = value;
+	return moveSpeed;
 }
 
 ComponentEvents::ComponentEvents()
 {
 	this->moveSpeed = 1.0f;
-	this->baseMoveMod = FULL;
 }

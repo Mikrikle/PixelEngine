@@ -4,11 +4,23 @@ using namespace Px;
 PxStaticBackground::PxStaticBackground(glm::mat4x3 color, Shader* shader) : ComponentBase(2.0f, 2.0f)
 {
 	this->shader = shader;
+	changeBackground(color);
+}
+
+PxStaticBackground::PxStaticBackground(glm::mat2x3 color, Shader* shader) : ComponentBase(2.0f, 2.0f)
+{
+	this->shader = shader;
+	changeBackground(color);
 }
 
 void PxStaticBackground::changeBackground(glm::mat4x3 color)
 {
-	genBackground(color, 2.0f, 2.0f);
+	genVAO(color, 2.0f, 2.0f, 6);
+}
+
+void PxStaticBackground::changeBackground(glm::mat2x3 color)
+{
+	genVAO(color, 2.0f, 2.0f, 12);
 }
 
 void PxStaticBackground::draw()

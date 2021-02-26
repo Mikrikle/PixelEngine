@@ -1,15 +1,27 @@
 #include "../includes/PixelEngine.h"
 using namespace Px;
 
-PxCanvas::PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY) :
-	PxCanvas(ROWS, COLS, WIDTH, HEIGHT, bgcolor, shader)
+PxCanvas::PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY,
+	void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime)) :
+	PxCanvas(ROWS, COLS, WIDTH, HEIGHT, shader, event_click, event_scrool, event_keyboard)
 {
+	genVAO(bgcolor, this->WIDTH, this->HEIGHT, 6);
 	setScale(scale);
 	setTranslate(posX, posY);
 }
 
-PxCanvas::PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader) :
-	ComponentMovable(WIDTH, HEIGHT)
+PxCanvas::PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY,
+	void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime)) :
+	PxCanvas(ROWS, COLS, WIDTH, HEIGHT, shader, event_click, event_scrool, event_keyboard)
+{
+	genVAO(bgcolor, this->WIDTH, this->HEIGHT, 12);
+	setScale(scale);
+	setTranslate(posX, posY);
+}
+
+PxCanvas::PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, Shader* shader,
+	void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime)) :
+	ComponentMovable(WIDTH * 2, HEIGHT * 2)
 {
 	this->shader = shader;
 	this->ROWS = ROWS;
@@ -21,7 +33,9 @@ PxCanvas::PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat4x3 bg
 	this->MousePosRow = 0;
 	for (int elem = 0; elem < SIZE; elem++)
 		this->pixelCanvas[elem] = 0.0f;
-	genBackground(bgcolor, WIDTH, HEIGHT);
+	this->event_click = event_click;
+	this->event_scrool = event_scrool;
+	this->event_keyboard = event_keyboard;
 	genTexture();
 }
 
@@ -32,7 +46,12 @@ PxCanvas::~PxCanvas()
 
 void PxCanvas::changeBackground(glm::mat4x3 color)
 {
-	genBackground(color, WIDTH, HEIGHT);
+	genVAO(color, WIDTH, HEIGHT, 6);
+}
+
+void PxCanvas::changeBackground(glm::mat2x3 color)
+{
+	genVAO(color, WIDTH, HEIGHT, 12);
 }
 
 void PxCanvas::draw()
@@ -61,6 +80,16 @@ int PxCanvas::getROWS()
 int PxCanvas::getCOLS()
 {
 	return COLS;
+}
+
+int PxCanvas::getMouseCol()
+{
+	return MousePosCol;
+}
+
+int PxCanvas::getMouseRow()
+{
+	return MousePosRow;
 }
 
 void PxCanvas::setPixel(int i, int j, float r, float g, float b)
@@ -108,32 +137,17 @@ void PxCanvas::clear()
 
 void PxCanvas::eventProcessing(float deltaTime)
 {
-	if (baseMoveMod != Px::STATIC)
-	{
-		if (baseMoveMod == Px::MOVABLE || baseMoveMod == Px::FULL)
-		{
-			if (Px::Keys[68])
-				increaseTranslate(0.1f * deltaTime * moveSpeed, 0.0f);
-			if (Px::Keys[65])
-				increaseTranslate(-0.1f * deltaTime * moveSpeed, 0.0f);
-			if (Px::Keys[87])
-				increaseTranslate(0.0f, 0.1f * deltaTime * moveSpeed);
-			if (Px::Keys[83])
-				increaseTranslate(0.0f, -0.1f * deltaTime * moveSpeed);
-		}
-		if (baseMoveMod == Px::SCALED || baseMoveMod == Px::FULL)
-		{
-			if ((Px::ScrollY > 0 && getScale() < 10.0) || (Px::ScrollY < 0 && getScale() > 0.4))
-				increaseScale(Px::ScrollY / 4.0f * deltaTime * moveSpeed);
-			Px::ScrollX = 0.0f;
-			Px::ScrollY = 0.0f;
-		}
-	}
+	if(event_scrool != nullptr)
+		event_scrool(*(this));
+	if(event_keyboard != nullptr)
+		event_keyboard(*(this), deltaTime);
 
-	if (isClickOn(Px::MousePosX, Px::MousePosY))
+	if (isClickOn(Px::MousePosX, Px::MousePosY) && (Px::MouseLeftClick || Px::MouseRightClick))
 	{
 		MousePosCol = (absoluteMousePos.x - realPos.x) * getCOLS() / (getWIDTH() * getScale());
 		MousePosRow = getROWS() - ((absoluteMousePos.y - realPos.y) * getROWS() / (getHEIGHT() * getScale()));
+		if(event_click != nullptr)
+			event_click(*(this));
 	}
 	else
 	{

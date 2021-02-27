@@ -13,6 +13,8 @@
 
 #include "../includes/windowGLFM.h"
 #include "../includes/PixelEngine.h"
+#include "../includes/PxWindowEvents.h"
+
 
 const int ROWS = 400, COLS = 400;
 
@@ -88,6 +90,7 @@ void update()
 }
 
 Px::EventsDefaultManager pxmanager;
+Px::DrawManager drawmanager;
 
 bool pause = false;
 void btn_pause_clbk()
@@ -134,6 +137,7 @@ int main()
 	Shader shader("../shaders/vertexShader.txt", "../shaders/fragmentShader.txt");
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
 	Px::PxCanvas px(ROWS, COLS, 1.0f, 1.0f, glm::make_mat4x3(colors), &shader, 1.0f, 0.0f, 0.0f, event_px_on_click, event_px_scroll, nullptr);
+	px.setOpacity(0.2f);
 
 	float btn_pause_colors[6]{ 0.0f, 0.0f, 0.8f, 0.0f, 0.0f, 0.6f };
 	Px::PxButton btn_pause(0.04f, 0.04f, glm::make_mat2x3(btn_pause_colors), &shader, 1.0f, 0.9f, 0.9f, btn_pause_clbk);
@@ -141,19 +145,17 @@ int main()
 	float btn_restart_colors[6]{ 0.0f, 1.0f, 0.8f, 0.0f, 0.5f, 0.6f };
 	Px::PxButton btn_restrat(0.04f, 0.04f, glm::make_mat2x3(btn_restart_colors), &shader, 1.0f, 0.8f, 0.9f, btn_restrat_clbk);
 
-	pxmanager.appendObj(px);
-	pxmanager.appendObj(btn_pause);
-	pxmanager.appendObj(btn_restrat);
+	Px::ComponentEvents* events_objects[]{ &px, &btn_pause, &btn_restrat };
+	pxmanager.appendObjects(3, events_objects);
 
-	float deltaTime = 0.0f;
-	float lastFrame = 0.0f;
+	Px::ComponentBase* draw_objects[]{ &px, &btn_pause, &btn_restrat };
+	drawmanager.appendObjects(3, draw_objects);
+
+
 	while (!window.isShouldClose())
 	{
 		window.clearWindow(0.2f, 0.3f, 0.3f);
-
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
+		Px::WindowEvents::UpdateTimer();
 
 		if (!pause)
 		{
@@ -171,14 +173,10 @@ int main()
 			update();
 		}
 
-		px.setOpacity(0.2f);
-		px.draw();
-		btn_pause.draw();
-		btn_restrat.draw();
-
+		drawmanager.drawAll();
+		pxmanager.updateEvents(Px::deltaTime);
 		window.swapBuffers();
-		glfwPollEvents();
-		pxmanager.updateEvents(deltaTime);
+		window.poolEvents();
 	}
 	return 0;
 

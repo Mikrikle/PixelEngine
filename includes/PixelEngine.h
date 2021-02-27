@@ -7,6 +7,8 @@
 
 namespace Px
 {
+	class ComponentBase;
+
 	typedef struct
 	{
 		float x;
@@ -22,6 +24,8 @@ namespace Px
 	extern float ScrollX;
 	extern float ScrollY;
 	extern bool Keys[1024];
+	extern float deltaTime;
+	extern float lastFrame;
 
 
 	class ComponentEvents
@@ -50,6 +54,20 @@ namespace Px
 		~EventsDefaultManager();
 		void updateEvents(float deltaTime);
 		void appendObj(ComponentEvents& obj);
+		void appendObjects(int n, ComponentEvents* objects[]);
+	};
+
+	class DrawManager
+	{
+	public:
+		ComponentBase** objects;
+		int objectsCounter;
+
+		DrawManager();
+		~DrawManager();
+		void drawAll();
+		void appendObj(ComponentBase& obj);
+		void appendObjects(int n, ComponentBase* objects[]);
 	};
 
 	class VAOrectangleComponent
@@ -95,6 +113,7 @@ namespace Px
 	public:
 		float getWIDTH();
 		float getHEIGHT();
+		virtual void draw() {};
 
 	protected:
 		float WIDTH;
@@ -114,7 +133,7 @@ namespace Px
 		void setTranslate(float x, float y);
 		void increaseTranslate(float moveX, float moveY);
 		FloatCoord getNullPos();
-		bool isClickOn(int x, int y);
+		bool isCollise(int x, int y);
 
 	protected:
 		float scale;
@@ -143,7 +162,7 @@ namespace Px
 		void setPixel(float r, float g, float b);
 		void setLine(int i, int j, GLfloat r, GLfloat g, GLfloat b, int end_i, int end_j, int width);
 		void clear();
-		void draw();
+		void draw() override;
 		void eventProcessing(float deltaTime) override;
 		int getROWS();
 		int getCOLS();
@@ -175,7 +194,7 @@ namespace Px
 		PxStaticBackground(glm::mat2x3 color, Shader* shader);
 		void changeBackground(glm::mat4x3 color);
 		void changeBackground(glm::mat2x3 color);
-		void draw();
+		void draw() override;
 	};
 
 
@@ -187,7 +206,7 @@ namespace Px
 		PxButtonForObj(float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)(T& obj), T& obj);
 		void changeBackground(glm::mat4x3 color);
 		void changeBackground(glm::mat2x3 color);
-		void draw();
+		void draw() override;
 		void eventProcessing(float deltaTime) override;
 
 	private:
@@ -205,7 +224,7 @@ namespace Px
 		PxButton(float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)());
 		void changeBackground(glm::mat4x3 color);
 		void changeBackground(glm::mat2x3 color);
-		void draw();
+		void draw() override;
 		void eventProcessing(float deltaTime) override;
 
 	private:

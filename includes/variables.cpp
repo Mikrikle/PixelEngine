@@ -11,4 +11,6 @@ namespace Px
 	float ScrollX = 0.0f;
 	float ScrollY = 0.0f;
 	bool Keys[1024]{ 0 };
+	float deltaTime = 0.0f;
+	float lastFrame = 0.0f;
 }

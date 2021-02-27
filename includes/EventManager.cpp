@@ -32,3 +32,11 @@ void EventsDefaultManager::appendObj(ComponentEvents& obj)
 	delete[] this->objects;
 	this->objects = newobjects;
 }
+
+void EventsDefaultManager::appendObjects(int n, ComponentEvents* objects[])
+{
+	for (int i = 0; i < n; i++)
+	{
+		appendObj((*objects[i]));
+	}
+}

@@ -13,6 +13,8 @@
 
 #include "../includes/windowGLFM.h"
 #include "../includes/PixelEngine.h"
+#include "../includes/PxWindowEvents.h"
+
 
 int SIZEX = 800;
 int SIZEY = SIZEX;
@@ -95,14 +97,13 @@ int main()
 	float colors[12]{ 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
 	Px::PxCanvas px(SIZEX, SIZEY, 1.0f, 1.0f, glm::make_mat4x3(colors), &shader, 1.0f, 0.0f, 0.0f, nullptr, event_px_scroll, event_px_move);
 	px.setMoveSpeed(0.1f);
-
+	px.setOpacity(0.2f);
 	render(px);
 
 	while (!window.isShouldClose())
 	{
 		window.clearWindow(0.0f, 0.0f, 0.0f);
 
-		px.setOpacity(0.2f);
 		px.draw();
 		px.eventProcessing(1.0f);
 

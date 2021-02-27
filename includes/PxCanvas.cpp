@@ -137,17 +137,22 @@ void PxCanvas::clear()
 
 void PxCanvas::eventProcessing(float deltaTime)
 {
+
 	if(event_scrool != nullptr)
 		event_scrool(*(this));
 	if(event_keyboard != nullptr)
 		event_keyboard(*(this), deltaTime);
 
-	if (isClickOn(Px::MousePosX, Px::MousePosY) && (Px::MouseLeftClick || Px::MouseRightClick))
+	if (isCollise(Px::MousePosX, Px::MousePosY))
 	{
 		MousePosCol = (absoluteMousePos.x - realPos.x) * getCOLS() / (getWIDTH() * getScale());
 		MousePosRow = getROWS() - ((absoluteMousePos.y - realPos.y) * getROWS() / (getHEIGHT() * getScale()));
-		if(event_click != nullptr)
-			event_click(*(this));
+
+		if (Px::MouseLeftClick || Px::MouseRightClick)
+		{
+			if (event_click != nullptr)
+				event_click(*(this));
+		}
 	}
 	else
 	{

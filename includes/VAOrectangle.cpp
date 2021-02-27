@@ -21,7 +21,7 @@ void VAOrectangle::genVAO(glm::mat2x3 color, float WIDTH, float HEIGHT, int indi
 	WIDTH / 2.0f, -HEIGHT / 2.0f, 0.0f,   color[0].x, color[0].y, color[0].z, 1.0f, 0.0f,
    -WIDTH / 2.0f, -HEIGHT / 2.0f, 0.0f,   color[0].x, color[0].y, color[0].z, 0.0f, 0.0f,
    -WIDTH / 2.0f,  HEIGHT / 2.0f, 0.0f,   color[0].x, color[0].y, color[0].z, 0.0f, 1.0f,
-	0.0f, 0.0f, 0.0f,                   color[1].x, color[1].y, color[1].z, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f,                   color[1].x, color[1].y, color[1].z, 0.5f, 0.5f,
 	};
 	genBuffers(vertices, sizeof(vertices), indices4triangles, sizeof(indices4triangles));
 }

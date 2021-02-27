@@ -51,9 +51,9 @@ void ComponentMovable::increaseTranslate(float moveX, float moveY)
 	normilizeNullCoords();
 }
 
-bool ComponentMovable::isClickOn(int x, int y)
+bool ComponentMovable::isCollise(int x, int y)
 {
-	if (x >= 0 && x <= Px::WindowSizeY && y >= 0 && y <= Px::WindowSizeY)
+	if (x >= 0 && x <= Px::WindowSizeX && y >= 0 && y <= Px::WindowSizeY)
 	{
 		absoluteMousePos = FloatCoord{ (x / ((float)Px::WindowSizeX / 2.0f)) - 1.0f, (((float)Px::WindowSizeY - y) / ((float)Px::WindowSizeY / 2)) - 1.0f };
 		realPos = FloatCoord{ nullPos.x - (scale - 1) * WIDTH / 2 , nullPos.y - (scale - 1) * HEIGHT / 2 };

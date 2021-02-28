@@ -2,13 +2,13 @@
 using namespace Px;
 
 
-void VAOrectangleComponent::setOpacity(float value)
+void VAOComponent::setOpacity(float value)
 {
 	if (value >= 0.0 && value <= 1.0)
 		this->TextureOpacity = value;
 }
 
-VAOrectangleComponent::VAOrectangleComponent()
+VAOComponent::VAOComponent()
 {
 	this->TEXTURE = 0;
 	this->VAO = 0;
@@ -17,22 +17,23 @@ VAOrectangleComponent::VAOrectangleComponent()
 	this->indicesSize = 0;
 }
 
-VAOrectangleComponent::~VAOrectangleComponent()
+VAOComponent::~VAOComponent()
 {
 	glDeleteVertexArrays(1, &this->VAO);
 }
 
-void VAOrectangleComponent::genBuffers(GLfloat* vertices, GLuint sizeV, GLuint* indices, GLuint sizeI)
+void VAOComponent::genBuffers(GLfloat* vertices, GLuint sizeV, GLuint* indices, GLuint sizeI)
 {
 	GLuint VBO, EBO;
+	glDeleteVertexArrays(1, &this->VAO);
 	glGenVertexArrays(1, &this->VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 	glBindVertexArray(this->VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeV, vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeV, vertices, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeI, indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeI, indices, GL_DYNAMIC_DRAW);
 	// coords
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -45,9 +46,12 @@ void VAOrectangleComponent::genBuffers(GLfloat* vertices, GLuint sizeV, GLuint* 
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 }
 
-void VAOrectangleComponent::genTexture()
+void VAOComponent::genTexture()
 {
 	glGenTextures(1, &this->TEXTURE);
 	glBindTexture(GL_TEXTURE_2D, this->TEXTURE);

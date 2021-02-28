@@ -70,7 +70,7 @@ namespace Px
 		void appendObjects(int n, ComponentBase* objects[]);
 	};
 
-	class VAOrectangleComponent
+	class VAOComponent
 	{
 	public:
 		void setOpacity(float value);
@@ -81,14 +81,14 @@ namespace Px
 		int indicesSize;
 		Shader* shader;
 
-		VAOrectangleComponent();
-		~VAOrectangleComponent();
+		VAOComponent();
+		~VAOComponent();
 		virtual void drawVAO() = 0;
 		void genBuffers(GLfloat* vertices, GLuint sizeV, GLuint* indices, GLuint sizeI);
 		void genTexture();
 	};
 
-	class VAOrectangle : public VAOrectangleComponent
+	class VAOrectangle : public VAOComponent
 	{
 	protected:
 		GLuint indices2triangles[6] = {

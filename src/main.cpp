@@ -81,7 +81,7 @@ int main()
 	while (!window.isShouldClose())
 	{
 		window.clearWindow(0.2f, 0.3f, 0.3f);
-		Px::WindowEvents::UpdateTimer();
+
 
 		bg.changeBackground(glm::make_mat4x3(BgColor));
 		for (int i = 0; i < 12; i += 1)
@@ -96,6 +96,10 @@ int main()
 		window.swapBuffers();
 		window.poolEvents();
 		
+		if (px.isRectCollisionWith(btn))
+		{
+			std::cout << "Collision! ";
+		}
 	}
 	return 0;
 

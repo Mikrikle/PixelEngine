@@ -47,6 +47,7 @@ void Window::swapBuffers()
 
 void Window::poolEvents()
 {
+	Px::WindowEvents::UpdateTimer();
 	glfwPollEvents();
 }
 

@@ -143,10 +143,10 @@ void PxCanvas::eventProcessing(float deltaTime)
 	if(event_keyboard != nullptr)
 		event_keyboard(*(this), deltaTime);
 
-	if (isCollise(Px::MousePosX, Px::MousePosY))
+	if (IsLocatedOnObject(Px::MousePosX, Px::MousePosY))
 	{
-		MousePosCol = (absoluteMousePos.x - realPos.x) * getCOLS() / (getWIDTH() * getScale());
-		MousePosRow = getROWS() - ((absoluteMousePos.y - realPos.y) * getROWS() / (getHEIGHT() * getScale()));
+		MousePosCol = (absoluteMousePos.x - realPos.x) * getCOLS() / getScaledSIZE().x;
+		MousePosRow = getROWS() - ((absoluteMousePos.y - realPos.y) * getROWS() / getScaledSIZE().y);
 
 		if (Px::MouseLeftClick || Px::MouseRightClick)
 		{

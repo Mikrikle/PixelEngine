@@ -133,7 +133,10 @@ namespace Px
 		void setTranslate(float x, float y);
 		void increaseTranslate(float moveX, float moveY);
 		FloatCoord getNullPos();
-		bool isCollise(int x, int y);
+		FloatCoord getScaledSIZE();
+		bool IsLocatedOnObject(int x, int y);
+		bool ComponentMovable::isRectCollisionWith(ComponentMovable& obj);
+		bool ComponentMovable::isRoundCollisionWith(ComponentMovable& obj);
 
 	protected:
 		float scale;
@@ -166,6 +169,7 @@ namespace Px
 		void eventProcessing(float deltaTime) override;
 		int getROWS();
 		int getCOLS();
+
 		int getMouseCol();
 		int getMouseRow();
 

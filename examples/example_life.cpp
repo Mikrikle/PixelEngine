@@ -155,7 +155,6 @@ int main()
 	while (!window.isShouldClose())
 	{
 		window.clearWindow(0.2f, 0.3f, 0.3f);
-		Px::WindowEvents::UpdateTimer();
 
 		if (!pause)
 		{

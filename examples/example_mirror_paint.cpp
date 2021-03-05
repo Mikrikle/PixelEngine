@@ -77,7 +77,6 @@ int main()
 	while (!window.isShouldClose())
 	{
 		window.clearWindow(0.5f, 0.5f, 0.5f);
-		Px::WindowEvents::UpdateTimer();
 		drawmanager.drawAll();
 		pxmanager.updateEvents(Px::deltaTime);
 		lasti = px.getMouseRow();

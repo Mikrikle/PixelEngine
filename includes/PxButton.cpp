@@ -53,7 +53,7 @@ void PxButton::draw()
 
 void PxButton::eventProcessing(float deltaTime)
 {
-	if (isCollise(Px::MousePosX, Px::MousePosY) && Px::MouseLeftClick)
+	if (IsLocatedOnObject(Px::MousePosX, Px::MousePosY) && Px::MouseLeftClick)
 	{
 		btncallback();
 		Px::MouseLeftClick = false;

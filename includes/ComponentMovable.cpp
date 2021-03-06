@@ -9,6 +9,7 @@ ComponentMovable::ComponentMovable(float WIDTH, float HEIGHT) : ComponentBase(WI
 	this->absoluteMousePos = FloatCoord{ -1.0f , -1.0f };
 	this->realPos = FloatCoord{ nullPos.x - (scale - 1) * WIDTH / 2 , nullPos.y - (scale - 1) * HEIGHT / 2 };
 	this->transform = glm::mat4(1.0f);
+	normilizeNullCoords();
 }
 
 FloatCoord ComponentMovable::getNullPos()
@@ -16,9 +17,25 @@ FloatCoord ComponentMovable::getNullPos()
 	return nullPos;
 }
 
+FloatCoord ComponentMovable::getRealPos()
+{
+	this->realPos = FloatCoord{ nullPos.x - (scale - 1) * WIDTH / 2 , nullPos.y - (scale - 1) * HEIGHT / 2 };
+	return realPos;
+}
+
+FloatCoord ComponentMovable::getTranslatePos()
+{
+	return translatePos;
+}
+
 void ComponentMovable::normilizeNullCoords()
 {
 	nullPos = FloatCoord{ round(nullPos.x * 10000) / 10000, round(nullPos.y * 10000) / 10000 };
+}
+
+void ComponentMovable::updateRealPos()
+{
+	this->realPos = FloatCoord{ nullPos.x - (scale - 1) * WIDTH / 2 , nullPos.y - (scale - 1) * HEIGHT / 2 };
 }
 
 float ComponentMovable::getScale()
@@ -62,7 +79,7 @@ bool ComponentMovable::IsLocatedOnObject(int x, int y)
 	if (x >= 0 && x <= Px::WindowSizeX && y >= 0 && y <= Px::WindowSizeY)
 	{
 		absoluteMousePos = FloatCoord{ (x / ((float)Px::WindowSizeX / 2.0f)) - 1.0f, (((float)Px::WindowSizeY - y) / ((float)Px::WindowSizeY / 2)) - 1.0f };
-		realPos = FloatCoord{ nullPos.x - (scale - 1) * WIDTH / 2 , nullPos.y - (scale - 1) * HEIGHT / 2 };
+		updateRealPos();
 
 		if (absoluteMousePos.x > realPos.x && absoluteMousePos.x < realPos.x + getScaledSIZE().x &&
 			absoluteMousePos.y > realPos.y && absoluteMousePos.y < realPos.y + getScaledSIZE().y)
@@ -75,17 +92,19 @@ bool ComponentMovable::IsLocatedOnObject(int x, int y)
 
 bool ComponentMovable::isRectCollisionWith(ComponentMovable& obj)
 {
+	this->updateRealPos();
+	obj.updateRealPos();
 	bool collisionX = this->realPos.x + this->getScaledSIZE().x >= obj.realPos.x &&
-		obj.getScaledSIZE().x + obj.realPos.x >= this->realPos.x;
-
+		obj.realPos.x + obj.getScaledSIZE().x >= this->realPos.x;
 	bool collisionY = this->realPos.y + this->getScaledSIZE().y >= obj.realPos.y &&
 		obj.realPos.y + obj.getScaledSIZE().y >= this->realPos.y;
-
 	return collisionX && collisionY;
 }
 
 bool ComponentMovable::isRoundCollisionWith(ComponentMovable& obj)
 {
+	this->updateRealPos();
+	obj.updateRealPos();
 	glm::vec2 center(this->realPos.x + this->getScaledSIZE().x / 2, this->realPos.y + this->getScaledSIZE().y / 2);
 	glm::vec2 aabb_half_extents(obj.getScaledSIZE().x / 2.0f, obj.getScaledSIZE().y / 2.0f);
 	glm::vec2 aabb_center(

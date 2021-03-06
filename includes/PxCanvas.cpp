@@ -3,36 +3,28 @@ using namespace Px;
 
 PxCanvas::PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY,
 	void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime)) :
-	PxCanvas(ROWS, COLS, WIDTH, HEIGHT, shader, event_click, event_scrool, event_keyboard)
+	AbstractRectangle(WIDTH, HEIGHT, bgcolor, shader, scale, posX, posY)
 {
-	genVAO(bgcolor, this->WIDTH, this->HEIGHT, 6);
-	setScale(scale);
-	setTranslate(posX, posY);
+	init(ROWS, COLS, event_click, event_scrool, event_keyboard);
 }
 
 PxCanvas::PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY,
 	void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime)) :
-	PxCanvas(ROWS, COLS, WIDTH, HEIGHT, shader, event_click, event_scrool, event_keyboard)
+	AbstractRectangle(WIDTH, HEIGHT, bgcolor, shader, scale, posX, posY)
 {
-	genVAO(bgcolor, this->WIDTH, this->HEIGHT, 12);
-	setScale(scale);
-	setTranslate(posX, posY);
+	init(ROWS, COLS, event_click, event_scrool, event_keyboard);
 }
 
-PxCanvas::PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, Shader* shader,
-	void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime)) :
-	ComponentMovable(WIDTH * 2, HEIGHT * 2)
+void PxCanvas::init(int ROWS, int COLS, void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime))
 {
-	this->shader = shader;
 	this->ROWS = ROWS;
 	this->COLS = COLS;
-	this->transform = glm::mat4(1.0f);
 	this->SIZE = COLS * ROWS * 3;
 	this->pixelCanvas = new float[SIZE];
-	this->MousePosCol = 0;
-	this->MousePosRow = 0;
 	for (int elem = 0; elem < SIZE; elem++)
 		this->pixelCanvas[elem] = 0.0f;
+	this->MousePosCol = 0;
+	this->MousePosRow = 0;
 	this->event_click = event_click;
 	this->event_scrool = event_scrool;
 	this->event_keyboard = event_keyboard;
@@ -44,32 +36,10 @@ PxCanvas::~PxCanvas()
 	delete[] pixelCanvas;
 }
 
-void PxCanvas::changeBackground(glm::mat4x3 color)
-{
-	genVAO(color, WIDTH, HEIGHT, 6);
-}
-
-void PxCanvas::changeBackground(glm::mat2x3 color)
-{
-	genVAO(color, WIDTH, HEIGHT, 12);
-}
-
 void PxCanvas::draw()
 {
-	transform = glm::mat4(1.0f);
-	setPixelTexture();
-	shader->use();
-	shader->setFloat("TextureOpacity", this->TextureOpacity);
-	transform = glm::translatePos(transform, glm::vec3(translatePos.x, translatePos.y, 0.0f));
-	transform = glm::scale(transform, glm::vec3(scale, scale, 1.0));
-	glUniformMatrix4fv(glGetUniformLocation(shader->ID, "transform"), 1, GL_FALSE, glm::value_ptr(transform));
-	drawVAO();
-}
-
-void PxCanvas::setPixelTexture()
-{
-	glBindTexture(GL_TEXTURE_2D, this->TEXTURE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, COLS, ROWS, 0, GL_RGB, GL_FLOAT, this->pixelCanvas);
+	setTexture(this->pixelCanvas, this->ROWS, this->COLS);
+	this->AbstractRectangle::draw();
 }
 
 int PxCanvas::getROWS()
@@ -132,21 +102,26 @@ void PxCanvas::setLine(int i, int j, GLfloat r, GLfloat g, GLfloat b, int end_i,
 void PxCanvas::clear()
 {
 	for (int i = 0; i < SIZE; i++)
-		pixelCanvas[i] = 0.0f;
+		this->pixelCanvas[i] = 0.0f;
 }
 
 void PxCanvas::eventProcessing(float deltaTime)
 {
 
-	if(event_scrool != nullptr)
+	if (event_scrool != nullptr && (Px::ScrollX != 0 || Px::ScrollY != 0))
+	{
 		event_scrool(*(this));
-	if(event_keyboard != nullptr)
+	}
+		
+	if (event_keyboard != nullptr)
+	{
 		event_keyboard(*(this), deltaTime);
+	}
 
 	if (IsLocatedOnObject(Px::MousePosX, Px::MousePosY))
 	{
-		MousePosCol = (absoluteMousePos.x - realPos.x) * getCOLS() / getScaledSIZE().x;
-		MousePosRow = getROWS() - ((absoluteMousePos.y - realPos.y) * getROWS() / getScaledSIZE().y);
+		MousePosCol = (absoluteMousePos.x - realPos.x) * getCOLS() / (getWIDTH() * getScale());
+		MousePosRow = getROWS() - ((absoluteMousePos.y - realPos.y) * getROWS() / (getHEIGHT() * getScale()));
 
 		if (Px::MouseLeftClick || Px::MouseRightClick)
 		{

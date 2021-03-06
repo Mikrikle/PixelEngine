@@ -22,3 +22,8 @@ float ComponentBase::getHEIGHT()
 {
 	return HEIGHT;
 }
+
+FloatCoord ComponentBase::getSIZE()
+{
+	return FloatCoord{ WIDTH, HEIGHT };
+}

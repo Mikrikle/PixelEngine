@@ -71,6 +71,8 @@ int main()
 
 	float BtnColor[6]{ 0.0f, 0.0f, 0.0f, 0.6f, 0.0f, 0.0f, };
 	Px::PxButtonForObj<Px::PxCanvas> btn(0.05f, 0.05f, glm::make_mat2x3(BtnColor), &shader, 1.0f, 0.9f, 0.9f, btn_click, px);
+	btn.setBaseColor(0.0f, 0.0f, 0.5f);
+	btn.setOpacity(0.8f);
 
 	Px::ComponentEvents* events_objects[]{ &px, &btn };
 	pxmanager.appendObjects(2, events_objects);
@@ -81,7 +83,6 @@ int main()
 	while (!window.isShouldClose())
 	{
 		window.clearWindow(0.2f, 0.3f, 0.3f);
-
 
 		bg.changeBackground(glm::make_mat4x3(BgColor));
 		for (int i = 0; i < 12; i += 1)

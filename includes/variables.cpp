@@ -4,8 +4,8 @@ namespace Px
 {
 	bool MouseLeftClick = false;
 	bool MouseRightClick = false;
-	int WindowSizeX = 100;
-	int WindowSizeY = 100;
+	float absoluteMousePosX = 0.0f;
+	float absoluteMousePosY = 0.0f;
 	int MousePosX = 0;
 	int MousePosY = 0;
 	float ScrollX = 0.0f;

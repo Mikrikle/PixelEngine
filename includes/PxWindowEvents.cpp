@@ -12,6 +12,8 @@ void WindowEvents::glfwmouseMoveCallback(GLFWwindow* window, double xpos, double
 {
 	Px::MousePosX = (int)xpos;
 	Px::MousePosY = (int)ypos;
+	absoluteMousePosX = (Px::MousePosX / ((float)Px::WindowSizeX / 2.0f)) - 1.0f;
+	absoluteMousePosY = (((float)Px::WindowSizeY - Px::MousePosY) / ((float)Px::WindowSizeY / 2)) - 1.0f;
 }
 
 void WindowEvents::glfwmouseClickCallback(GLFWwindow* window, int button, int action, int mods)

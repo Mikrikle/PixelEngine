@@ -4,12 +4,12 @@ using namespace Px;
 
 void AbstractRectangle::changeBackground(glm::mat4x3 color)
 {
-	genVAO(color, this->WIDTH, this->HEIGHT, 6);
+	genVAO(color, this->SIZE.x, this->SIZE.y, 6);
 }
 
 void AbstractRectangle::changeBackground(glm::mat2x3 color)
 {
-	genVAO(color, this->WIDTH, this->HEIGHT, 12);
+	genVAO(color, this->SIZE.x, this->SIZE.y, 12);
 }
 
 void AbstractRectangle::draw() 
@@ -26,22 +26,22 @@ void AbstractRectangle::draw()
 AbstractRectangle::AbstractRectangle(float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY)
 	: AbstractRectangle(WIDTH, HEIGHT, shader, scale, posX, posY)
 {
-	genVAO(bgcolor, this->WIDTH, this->HEIGHT, 6);
+	genVAO(bgcolor, this->SIZE.x, this->SIZE.y, 6);
 }
 
 
 AbstractRectangle::AbstractRectangle(float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY)
 	: AbstractRectangle(WIDTH, HEIGHT, shader, scale, posX, posY)
 {
-	genVAO(bgcolor, this->WIDTH, this->HEIGHT, 12);
+	genVAO(bgcolor, this->SIZE.x, this->SIZE.y, 12);
 }
 
 
 AbstractRectangle::AbstractRectangle(float WIDTH, float HEIGHT, Shader* shader, float scale, float posX, float posY)
-	: ComponentMovable(WIDTH * 2, HEIGHT * 2)
+	: ComponentBase(WIDTH * 2, HEIGHT * 2)
 {
 	this->shader = shader;
 	genTexture();
 	setScale(scale);
-	setTranslate(posX, posY);
+	setPos(posX, posY);
 }

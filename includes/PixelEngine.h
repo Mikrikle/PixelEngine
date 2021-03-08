@@ -17,6 +17,8 @@ namespace Px
 
 	extern bool MouseLeftClick;
 	extern bool MouseRightClick;
+	extern float absoluteMousePosX;
+	extern float absoluteMousePosY;
 	extern int WindowSizeX;
 	extern int WindowSizeY;
 	extern int MousePosX;
@@ -27,45 +29,16 @@ namespace Px
 	extern float deltaTime;
 	extern float lastFrame;
 
-
-	class ComponentEvents
-	{
-	public:
-		void setMoveSpeed(float value);
-
-		virtual void eventProcessing(float deltaTime) {};
-
-		float getMoveSpeed();
-
-	protected:
-		float moveSpeed;
-
-		ComponentEvents();
-	};
-
-
-	class EventsDefaultManager
-	{
-	public:
-		ComponentEvents** objects;
-		int objectsCounter;
-
-		EventsDefaultManager();
-		~EventsDefaultManager();
-		void updateEvents(float deltaTime);
-		void appendObj(ComponentEvents& obj);
-		void appendObjects(int n, ComponentEvents* objects[]);
-	};
-
-	class DrawManager
+	class ObjectManager
 	{
 	public:
 		ComponentBase** objects;
 		int objectsCounter;
 
-		DrawManager();
-		~DrawManager();
+		ObjectManager();
+		~ObjectManager();
 		void drawAll();
+		void updateAll();
 		void appendObj(ComponentBase& obj);
 		void appendObjects(int n, ComponentBase* objects[]);
 	};
@@ -85,7 +58,7 @@ namespace Px
 		VAOComponent();
 		~VAOComponent();
 		virtual void drawVAO() = 0;
-		void genBuffers(GLfloat* vertices, GLuint sizeV, GLuint* indices, GLuint sizeI);
+		void genBuffers(GLfloat* vertices, GLuint sizeV, GLuint* indices, GLuint sizeI, bool useTexture);
 		void genTexture();
 		void setTexture(float* pixels, int ROWS, int COLS);
 	};
@@ -110,53 +83,50 @@ namespace Px
 		void drawVAO() override;
 	};
 
-	class ComponentBase
+	class VAOregularPolygon : public VAOComponent
 	{
-	public:
-		float getWIDTH();
-		float getHEIGHT();
-		FloatCoord getSIZE();
-		virtual void draw() {};
-
 	protected:
-		float WIDTH;
-		float HEIGHT;
+		GLuint* indices = nullptr;
+		GLuint verticesNumber;
 
-		ComponentBase(float WIDTH, float HEIGHT);
-		ComponentBase();
+		~VAOregularPolygon();
+		void genVAO(glm::mat2x3 color, float radius, int vertices_count);
+		void drawVAO() override;
 	};
 
-
-	class ComponentMovable : public ComponentBase
+	class ComponentBase 
 	{
 	public:
 		void setScale(float scale);
 		float getScale();
-		void increaseScale(float value);
-		void setTranslate(float x, float y);
-		void increaseTranslate(float moveX, float moveY);
-		FloatCoord getNullPos();
-		FloatCoord getRealPos();
+		void changeScale(float value);
+		void setPos(float x, float y);
+		void changePos(float moveX, float moveY);
+		FloatCoord getScaledPos();
+		FloatCoord getPos();
 		FloatCoord getScaledSIZE();
-		FloatCoord getTranslatePos();
-		bool IsLocatedOnObject(int x, int y);
-		bool ComponentMovable::isRectCollisionWith(ComponentMovable& obj);
-		bool ComponentMovable::isRoundCollisionWith(ComponentMovable& obj);
+		FloatCoord getSIZE();
+		bool isMouseOn();
+		bool isClickOn();
+		bool ComponentBase::isRectCollisionWith(ComponentBase& obj);
+		bool ComponentBase::isRoundCollisionWith(ComponentBase& obj);
+		virtual void draw() {};
+		virtual void update() {};
 
 	protected:
 		float scale;
+		FloatCoord SIZE;
 		FloatCoord translatePos;
 		FloatCoord nullPos;
-		FloatCoord absoluteMousePos;
 		FloatCoord realPos;
 		glm::mat4 transform;
 
-		ComponentMovable(float WIDTH, float HEIGHT);
 		void normilizeNullCoords();
 		void updateRealPos();
+		ComponentBase(float WIDTH, float HEIGHT);
 	};
 
-	class AbstractRectangle : public VAOrectangle, public ComponentMovable
+	class AbstractRectangle : public VAOrectangle, public ComponentBase
 	{
 	public:
 		void changeBackground(glm::mat4x3 color);
@@ -169,42 +139,32 @@ namespace Px
 	private:
 		AbstractRectangle(float WIDTH, float HEIGHT, Shader* shader, float scale, float posX, float posY);
 	};
-	
 
-	class PxRectangle : public AbstractRectangle, public ComponentEvents
+
+	class PxRectangle : public AbstractRectangle
 	{
 	public:
-		PxRectangle(float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY,
-			void (*event_click)(PxRectangle& self), void (*event_scrool)(PxRectangle& self), void (*event_keyboard)(PxRectangle& self, float deltaTime));
-		PxRectangle(float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY,
-			void (*event_click)(PxRectangle& self), void (*event_scrool)(PxRectangle& self), void (*event_keyboard)(PxRectangle& self, float deltaTime));
-		void eventProcessing(float deltaTime) override;
+		PxRectangle(float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY);
+		PxRectangle(float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY);
 	private:
-		void init(void (*event_click)(PxRectangle& self), void (*event_scrool)(PxRectangle& self), void (*event_keyboard)(PxRectangle& self, float deltaTime));
-
-		void (*event_click)(PxRectangle& self);
-		void (*event_scrool)(PxRectangle& self);
-		void (*event_keyboard)(PxRectangle& self, float deltaTime);
+		void init();
 	};
 
 
-	class PxCanvas : public AbstractRectangle, public ComponentEvents
+	class PxCanvas : public AbstractRectangle
 	{
 	public:
-		PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY,
-			void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime));
-		PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY,
-			void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime));
+		PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY);
+		PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY);
 		~PxCanvas();
 		void setPixel(int i, int j, float r, float g, float b);
 		void setPixel(float r, float g, float b);
 		void setLine(int i, int j, GLfloat r, GLfloat g, GLfloat b, int end_i, int end_j, int width);
 		void clear();
 		void draw() override;
-		void eventProcessing(float deltaTime) override;
+		void update() override;
 		int getROWS();
 		int getCOLS();
-
 		int getMouseCol();
 		int getMouseRow();
 
@@ -216,51 +176,45 @@ namespace Px
 		int MousePosCol;
 		int MousePosRow;
 
-		void (*event_click)(PxCanvas& self);
-		void (*event_scrool)(PxCanvas& self);
-		void (*event_keyboard)(PxCanvas& self, float deltaTime);
-
-		void init(int ROWS, int COLS, void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime));
-		void setPixelTexture();
+		void init(int ROWS, int COLS);
 	};
 
 
-	class PxStaticBackground : public ComponentBase, public VAOrectangle
+	class PxBackground : public AbstractRectangle
 	{
 	public:
-		PxStaticBackground(glm::mat4x3 color, Shader* shader);
-		PxStaticBackground(glm::mat2x3 color, Shader* shader);
-		void changeBackground(glm::mat4x3 color);
+		PxBackground(glm::mat4x3 color, Shader* shader);
+		PxBackground(glm::mat2x3 color, Shader* shader);
+	};
+
+
+	class PxButton : public AbstractRectangle
+	{
+	public:
+		PxButton(float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)(PxButton* self));
+		PxButton(float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)(PxButton* self));
+		void update() override;
+
+	private:
+		void init(void (*btncallback)(PxButton* self));
+		void (*btncallback)(PxButton* self);
+	};
+
+
+	class AbstractRegularPolygon : public VAOregularPolygon, public ComponentBase
+	{
+	protected:
+		AbstractRegularPolygon(float radius, float vertices_count, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY);
 		void changeBackground(glm::mat2x3 color);
 		void draw() override;
+	private:
+		int vertices_count;
 	};
 
 
-	template <typename T>
-	class PxButtonForObj : public AbstractRectangle, public ComponentEvents
+	class PxRegularPolygon : public AbstractRegularPolygon
 	{
 	public:
-		PxButtonForObj(float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)(T& obj), T& obj);
-		PxButtonForObj(float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)(T& obj), T& obj);
-		void eventProcessing(float deltaTime) override;
-
-	private:
-		void init(void (*btncallback)(T& obj), T& obj);
-		void (*btncallback)(T& obj);
-		T* bindObj;
-	};
-
-#include "../includes/PxButtonForObj.ini";
-
-	class PxButton : public AbstractRectangle, public ComponentEvents
-	{
-	public:
-		PxButton(float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)());
-		PxButton(float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY, void (*btncallback)());
-		void eventProcessing(float deltaTime) override;
-
-	private:
-		void init(void (*btncallback)());
-		void (*btncallback)();
+		PxRegularPolygon(float radius, float vertices_count, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY);
 	};
 }

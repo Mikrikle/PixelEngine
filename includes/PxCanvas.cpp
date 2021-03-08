@@ -1,21 +1,19 @@
 #include "../includes/PixelEngine.h"
 using namespace Px;
 
-PxCanvas::PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY,
-	void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime)) :
+PxCanvas::PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat4x3 bgcolor, Shader* shader, float scale, float posX, float posY) :
 	AbstractRectangle(WIDTH, HEIGHT, bgcolor, shader, scale, posX, posY)
 {
-	init(ROWS, COLS, event_click, event_scrool, event_keyboard);
+	init(ROWS, COLS);
 }
 
-PxCanvas::PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY,
-	void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime)) :
+PxCanvas::PxCanvas(int ROWS, int COLS, float WIDTH, float HEIGHT, glm::mat2x3 bgcolor, Shader* shader, float scale, float posX, float posY) :
 	AbstractRectangle(WIDTH, HEIGHT, bgcolor, shader, scale, posX, posY)
 {
-	init(ROWS, COLS, event_click, event_scrool, event_keyboard);
+	init(ROWS, COLS);
 }
 
-void PxCanvas::init(int ROWS, int COLS, void (*event_click)(PxCanvas& self), void (*event_scrool)(PxCanvas& self), void (*event_keyboard)(PxCanvas& self, float deltaTime))
+void PxCanvas::init(int ROWS, int COLS)
 {
 	this->ROWS = ROWS;
 	this->COLS = COLS;
@@ -25,9 +23,6 @@ void PxCanvas::init(int ROWS, int COLS, void (*event_click)(PxCanvas& self), voi
 		this->pixelCanvas[elem] = 0.0f;
 	this->MousePosCol = 0;
 	this->MousePosRow = 0;
-	this->event_click = event_click;
-	this->event_scrool = event_scrool;
-	this->event_keyboard = event_keyboard;
 	genTexture();
 }
 
@@ -40,6 +35,20 @@ void PxCanvas::draw()
 {
 	setTexture(this->pixelCanvas, this->ROWS, this->COLS);
 	this->AbstractRectangle::draw();
+}
+
+void Px::PxCanvas::update()
+{
+	if (isMouseOn())
+	{
+		MousePosCol = (Px::absoluteMousePosX - realPos.x) * getCOLS() / (getSIZE().x * getScale());
+		MousePosRow = getROWS() - ((Px::absoluteMousePosY - realPos.y) * getROWS() / (getSIZE().y * getScale()));
+	}
+	else
+	{
+		MousePosCol = -1;
+		MousePosRow = -1;
+	}
 }
 
 int PxCanvas::getROWS()
@@ -103,36 +112,4 @@ void PxCanvas::clear()
 {
 	for (int i = 0; i < SIZE; i++)
 		this->pixelCanvas[i] = 0.0f;
-}
-
-void PxCanvas::eventProcessing(float deltaTime)
-{
-
-	if (event_scrool != nullptr && (Px::ScrollX != 0 || Px::ScrollY != 0))
-	{
-		event_scrool(*(this));
-	}
-		
-	if (event_keyboard != nullptr)
-	{
-		event_keyboard(*(this), deltaTime);
-	}
-
-	if (IsLocatedOnObject(Px::MousePosX, Px::MousePosY))
-	{
-		MousePosCol = (absoluteMousePos.x - realPos.x) * getCOLS() / (getWIDTH() * getScale());
-		MousePosRow = getROWS() - ((absoluteMousePos.y - realPos.y) * getROWS() / (getHEIGHT() * getScale()));
-
-		if (Px::MouseLeftClick || Px::MouseRightClick)
-		{
-			if (event_click != nullptr)
-				event_click(*(this));
-		}
-	}
-	else
-	{
-		MousePosCol = -1;
-		MousePosRow = -1;
-	}
-
 }

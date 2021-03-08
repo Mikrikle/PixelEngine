@@ -1,7 +1,7 @@
 #include "PixelEngine.h"
 using namespace Px;
 
-void DrawManager::drawAll()
+void ObjectManager::drawAll()
 {
 	for (int i = 0; i < objectsCounter; i++)
 	{
@@ -9,18 +9,26 @@ void DrawManager::drawAll()
 	}
 }
 
-DrawManager::DrawManager()
+void Px::ObjectManager::updateAll()
+{
+	for (int i = 0; i < objectsCounter; i++)
+	{
+		objects[i]->update();
+	}
+}
+
+ObjectManager::ObjectManager()
 {
 	this->objectsCounter = 0;
 	this->objects = nullptr;
 }
 
-DrawManager::~DrawManager()
+ObjectManager::~ObjectManager()
 {
 	delete[] objects;
 }
 
-void DrawManager::appendObj(ComponentBase& obj)
+void ObjectManager::appendObj(ComponentBase& obj)
 {
 	this->objectsCounter++;
 	ComponentBase** newobjects = new ComponentBase * [this->objectsCounter];
@@ -33,7 +41,7 @@ void DrawManager::appendObj(ComponentBase& obj)
 	this->objects = newobjects;
 }
 
-void DrawManager::appendObjects(int n, ComponentBase* objects[])
+void ObjectManager::appendObjects(int n, ComponentBase* objects[])
 {
 	for (int i = 0; i < n; i++)
 	{

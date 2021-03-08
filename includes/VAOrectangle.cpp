@@ -10,7 +10,7 @@ void VAOrectangle::genVAO(glm::mat4x3 color, float WIDTH, float HEIGHT, int indi
    -WIDTH / 2.0f, -HEIGHT / 2.0f, 0.0f,   color[2].x, color[2].y, color[2].z, 0.0f, 0.0f,
    -WIDTH / 2.0f,  HEIGHT / 2.0f, 0.0f,   color[3].x, color[3].y, color[3].z, 0.0f, 1.0f,
 	};
-	genBuffers(vertices, sizeof(vertices), indices2triangles, sizeof(indices2triangles));
+	genBuffers(vertices, sizeof(vertices), indices2triangles, sizeof(indices2triangles), true);
 }
 
 void VAOrectangle::genVAO(glm::mat2x3 color, float WIDTH, float HEIGHT, int indicesSize)
@@ -23,7 +23,7 @@ void VAOrectangle::genVAO(glm::mat2x3 color, float WIDTH, float HEIGHT, int indi
    -WIDTH / 2.0f,  HEIGHT / 2.0f, 0.0f,   color[0].x, color[0].y, color[0].z, 0.0f, 1.0f,
 	0.0f, 0.0f, 0.0f,                   color[1].x, color[1].y, color[1].z, 0.5f, 0.5f,
 	};
-	genBuffers(vertices, sizeof(vertices), indices4triangles, sizeof(indices4triangles));
+	genBuffers(vertices, sizeof(vertices), indices4triangles, sizeof(indices4triangles), true);
 }
 
 void VAOrectangle::drawVAO()

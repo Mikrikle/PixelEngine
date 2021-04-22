@@ -93,14 +93,14 @@ void drawMirrored(px::PxCanvas& self, int lasti, int lastj, GLfloat r, GLfloat g
 	{
 		if (new_r < ROWS / 2)
 		{
-			self.setLine(ROWS / 2 + sin(new_f + (angle * axe)) * new_r, COLS / 2 + cos(new_f + (angle * axe)) * new_r,
+			self.drawLine(ROWS / 2 + sin(new_f + (angle * axe)) * new_r, COLS / 2 + cos(new_f + (angle * axe)) * new_r,
 				r,g, b,
 				ROWS / 2 + sin(old_f + (angle * axe)) * old_r, COLS / 2 + cos(old_f + (angle * axe)) * old_r,
 				brushsize
 			);
 			if (symmetry)
 			{
-				self.setLine(ROWS / 2 + cos(new_f + (angle * axe + angle)) * new_r, COLS / 2 + sin(new_f + (angle * axe + angle)) * new_r,
+				self.drawLine(ROWS / 2 + cos(new_f + (angle * axe + angle)) * new_r, COLS / 2 + sin(new_f + (angle * axe + angle)) * new_r,
 					r, g, b,
 					ROWS / 2 + cos(old_f + (angle * axe + angle)) * old_r, COLS / 2 + sin(old_f + (angle * axe + angle)) * old_r,
 					brushsize

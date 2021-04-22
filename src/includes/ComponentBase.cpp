@@ -11,6 +11,11 @@ ComponentBase::ComponentBase(float width, float height)
 	normilizeNullCoords();
 }
 
+FloatCoord ComponentBase::getCenterPos()
+{
+	return FloatCoord{ getScaledPos().x + getScaledSIZE().x / 2, getScaledPos().y + getScaledSIZE().y / 2 };
+}
+
 FloatCoord ComponentBase::getSIZE()
 {
 	return size_;

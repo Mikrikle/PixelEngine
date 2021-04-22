@@ -25,22 +25,22 @@ void render()
 {
 	for (int i = SIZEX / 2, j = SIZEX / 2; i < SIZEX; i += scale, j -= scale)
 	{
-		px_canvas.setLine(0, i, 0.1f, 0.1f, 0.1f, SIZEY - 1, i, 1);
-		px_canvas.setLine(0, j, 0.1f, 0.1f, 0.1f, SIZEY - 1, j, 1);
+		px_canvas.drawLine(0, i, 0.1f, 0.1f, 0.1f, SIZEY - 1, i, 1);
+		px_canvas.drawLine(0, j, 0.1f, 0.1f, 0.1f, SIZEY - 1, j, 1);
 	}
 	for (int i = SIZEY / 2, j = SIZEX / 2; i < SIZEY; i += scale, j -= scale)
 	{
-		px_canvas.setLine(i, 0, 0.1f, 0.1f, 0.1f, i, SIZEX - 1, 1);
-		px_canvas.setLine(j, 0, 0.1f, 0.1f, 0.1f, j, SIZEX - 1, 1);
+		px_canvas.drawLine(i, 0, 0.1f, 0.1f, 0.1f, i, SIZEX - 1, 1);
+		px_canvas.drawLine(j, 0, 0.1f, 0.1f, 0.1f, j, SIZEX - 1, 1);
 	}
-	px_canvas.setLine(SIZEY / 2, 0, 0.5f, 0.5f, 0.5f, SIZEY / 2, SIZEX - 1, 1);
-	px_canvas.setLine(0, SIZEX / 2, 0.5f, 0.5f, 0.5f, SIZEY - 1, SIZEX / 2, 1);
+	px_canvas.drawLine(SIZEY / 2, 0, 0.5f, 0.5f, 0.5f, SIZEY / 2, SIZEX - 1, 1);
+	px_canvas.drawLine(0, SIZEX / 2, 0.5f, 0.5f, 0.5f, SIZEY - 1, SIZEX / 2, 1);
 
 	for (double x = -SIZEX / 2.0 + 1; x < SIZEX / 2.0 - 1; x += step)
 	{
 		if (!isnan(f(x)))
 		{
-			px_canvas.setPixel(SIZEY - round(f(x / scale) * scale + SIZEY / 2.0), round(x + SIZEX / 2.0), 1.0f, 0.0f, 0.0f);
+			px_canvas.setPixel(round(x + SIZEX / 2.0), SIZEY - round(f(x / scale) * scale + SIZEY / 2.0), 1.0f, 0.0f, 0.0f);
 		}
 	}
 }

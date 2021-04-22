@@ -120,6 +120,7 @@ void objectsEvents()
 		px_canvas.IncreaseScale(px::mouseScrollY / 4.0f);
 	if (px_canvas.getScale() < 1.0f)
 		px_canvas.setScale(1.0f);
+	px_canvas.setPosAtCenter();
 	px::mouseScrollY = 0;
 }
 

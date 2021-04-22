@@ -4,7 +4,6 @@
 #include <initializer_list>
 #include <functional>
 #include <algorithm>
-//#include <execution>
 #include <string>
 
 #include "../shaders/shader.h"
@@ -120,6 +119,7 @@ namespace px
 			void setPosAtCenter();
 			void setPosRelativeTo(ComponentBase& obj, RelativeBindingType side, float offsetX, float offsetY);
 			void setPosAtAbsoluteGrid(int row_num, int col_num);
+			FloatCoord getCenterPos();
 			FloatCoord getScaledPos();
 			FloatCoord getPos();
 			FloatCoord getScaledSIZE();
@@ -259,12 +259,16 @@ namespace px
 	public:
 		PxCanvas(int rows, int cols, float width = 1.0f, float height = 1.0f, float scale = 1.0f, float posX = -1.0f, float posY = -1.0f, Shader* shader = DefaultShader);
 		~PxCanvas();
+		int transformPercentsToCoordX(float absolute_x);
+		int transformPercentsToCoordY(float absolute_y);
 		glm::vec3 getPixel();
 		glm::vec3 getPixel(int row, int col);
-		void setPixel(int i, int j, float r, float g, float b);
+		void setPixel(int x, int y, float r, float g, float b);
 		void setPixel(float r, float g, float b);
+		void setPixel(int x, int y, glm::vec3 color);
 		void setPixel_unsafety(int i, int j, float r, float g, float b);
-		void setLine(int i, int j, GLfloat r, GLfloat g, GLfloat b, int end_i, int end_j, int width);
+		void drawLine(int x, int y, GLfloat r, GLfloat g, GLfloat b, int end_x, int end_y, int width);
+		void drawCircle(int x, int y, GLfloat r, GLfloat g, GLfloat b, int radius, bool fill = true);
 		void fillBlack();
 		void fillWhite();
 		void draw() override;

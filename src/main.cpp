@@ -8,7 +8,6 @@ int px::windowWidth = 800;
 int px::windowHeight = 800;
 
 Window window(px::windowWidth, px::windowHeight, "Game");
-
 Shader sh("../../src/shaders/vertexShader.txt", "../../src/shaders/fragmentShader.txt");
 Shader* px::DefaultShader = &sh;
 
@@ -43,3 +42,4 @@ int main()
 	}
 	return 0;
 }
+

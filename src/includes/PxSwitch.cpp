@@ -86,6 +86,12 @@ void PxSwitch::IncreasePos(float moveX, float moveY)
 	setTogglePos();
 }
 
+void PxSwitch::setActive(bool isActive)
+{
+	active_ = isActive;
+	setTogglePos();
+}
+
 void PxSwitch::setTogglePos()
 {
 	if (active_)

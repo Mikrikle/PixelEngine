@@ -330,6 +330,7 @@ namespace px
 		void draw();
 		PxRectangle toggle;
 
+		void setActive(bool isActive);
 		bool isActive() const;
 		void setScale(float scale) override;
 		void IncreaseScale(float value) override;
@@ -382,6 +383,7 @@ namespace px
 		void draw();
 		PxRectangle mark;
 
+		void setActive(bool isActive);
 		bool isActive() const;
 		void setScale(float scale) override;
 		void IncreaseScale(float value) override;

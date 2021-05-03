@@ -60,6 +60,11 @@ void PxCheckBox::update()
 	}
 }
 
+void PxCheckBox::setActive(bool isActive)
+{
+	active_ = isActive;
+}
+
 void PxCheckBox::setScale(float scale)
 {
 	AbstractRectangle::setScale(scale);

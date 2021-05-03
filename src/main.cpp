@@ -7,7 +7,7 @@
 int px::windowWidth = 800;
 int px::windowHeight = 800;
 
-Window window(px::windowWidth, px::windowHeight, "Game");
+Window window(px::windowWidth, px::windowHeight, "App_name");
 Shader sh("../../src/shaders/vertexShader.txt", "../../src/shaders/fragmentShader.txt");
 Shader* px::DefaultShader = &sh;
 
@@ -16,13 +16,13 @@ class App : public px::PxBaseApp
 public:
 	App()
 	{
-		init();
-		manager.init({ &test_r, &color_slider, &colored_rectangle, &isShowRound });
+		manager.init({ &test_r, &color_slider, &colored_rectangle, &isShowRound, &isSliderWork });
 		grid.init(3, 3, {
 			{nullptr, 1, 3},
-			{}, {&px::GridLayout(2, 1, { {&test_r}, {&colored_rectangle} })}, {&isShowRound},
+			{&isSliderWork}, {&px::GridLayout(2, 1, { {&test_r}, {&colored_rectangle} })}, {&isShowRound},
 			{&color_slider, 1, 3} }
 		);
+		init();
 	}
 
 	void objectsEvents()
@@ -36,6 +36,10 @@ public:
 		colored_rectangle.setTextureOpacity(1.0f);
 		colored_rectangle.setColorAsTexture(0.0f, color_slider.getPercentages() / 100.0f, 0.0f);
 		isShowRound.setColorAsTexture(0.5f, 0.0f, 0.0f);
+		isSliderWork.setUnderTextureColor(glm::mat4x3(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f));
+		isShowRound.setActive(true);
+		isSliderWork.setActive(true);
 	}
 
 private:
@@ -46,11 +50,22 @@ private:
 	px::PxCheckBox isShowRound{ [this](px::PxCheckBox* self) {
 		if (self->isActive())
 		{
-			manager.removeFromIgnoreDrawingList(0);
+			manager.addToIgnoreDrawingLsist(0);
 		}
 		else
 		{
-			manager.addToIgnoreDrawingLsist(0);
+			manager.removeFromIgnoreDrawingList(0);
+		}
+	} };
+
+	px::PxSwitch isSliderWork{ [this](px::PxSwitch* self) {
+		if (self->isActive())
+		{
+			manager.addToIgnoreUpdatingLsist(1);
+		}
+		else
+		{
+			manager.removeFromIgnoreUpdatingList(1);
 		}
 	} };
 

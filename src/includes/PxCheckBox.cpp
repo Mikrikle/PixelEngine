@@ -8,7 +8,6 @@ PxCheckBox::PxCheckBox(std::function<void(PxCheckBox* self)> callback, float wid
 	setPos(posX, posY);
 	setScale(scale);
 	callback_ = callback;
-	active_ = false;
 	mark.setColorAsTexture(1.0f, 1.0f, 1.0f);
 }
 
@@ -27,7 +26,7 @@ void PxCheckBox::draw()
 	}
 }
 
-bool PxCheckBox::isActive()
+bool PxCheckBox::isActive() const
 {
 	return active_;
 }

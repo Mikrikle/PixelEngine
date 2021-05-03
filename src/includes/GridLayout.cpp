@@ -1,7 +1,6 @@
 #include "PixelEngine.h"
 using namespace px;
 
-
 bool GridLayout::checkIterator(std::vector<gObj>::iterator it, int value)
 {
 	for (int i = 0; i < value; i++)
@@ -12,8 +11,7 @@ bool GridLayout::checkIterator(std::vector<gObj>::iterator it, int value)
 	return true;
 }
 
-GridLayout::GridLayout(int rows, int cols, std::initializer_list<gObj> objects, float width, float height, float scale, float posX, float posY) :
-	ComponentBase(width * 2.0f, height * 2.0f)
+void GridLayout::init(int rows, int cols, std::initializer_list<gObj> objects, float width, float height, float scale, float posX, float posY)
 {
 	setPos(posX, posY);
 	setScale(scale);
@@ -37,10 +35,26 @@ GridLayout::GridLayout(int rows, int cols, std::initializer_list<gObj> objects, 
 		*it = temp_obj;
 		if (it + (*it).col_span != objects_.end())
 			it += (*it).col_span;
-
 	}
 
 	reInitObjects();
+}
+
+GridLayout::GridLayout(int rows, int cols, std::initializer_list<gObj> objects, float width, float height, float scale, float posX, float posY) :
+	ComponentBase(width * 2.0f, height * 2.0f)
+{
+	init(rows, cols, objects, width, height, scale, posX, posY);
+}
+
+GridLayout::GridLayout(int rows, int cols, std::initializer_list<gObj> objects) :
+	ComponentBase(2.0f, 2.0f)
+{
+	init(rows, cols, objects);
+}
+
+GridLayout::GridLayout() : ComponentBase(2.0f, 2.0f)
+{
+	init(1, 1, {});
 }
 
 void GridLayout::draw()

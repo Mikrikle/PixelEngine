@@ -5,28 +5,27 @@ using namespace engine;
 ComponentBase::ComponentBase(float width, float height)
 {
 	size_ = FloatCoord{ width, height };
-	scale_ = 1.0f;
 	nullPos_ = FloatCoord{ -width / 2.0f, -height / 2.0f };
 	transformMatrix_ = glm::mat4(1.0f);
 	normilizeNullCoords();
 }
 
-FloatCoord ComponentBase::getCenterPos()
+FloatCoord ComponentBase::getCenterPos() const
 {
 	return FloatCoord{ getScaledPos().x + getScaledSIZE().x / 2, getScaledPos().y + getScaledSIZE().y / 2 };
 }
 
-FloatCoord ComponentBase::getSIZE()
+FloatCoord ComponentBase::getSIZE() const
 {
 	return size_;
 }
 
-FloatCoord ComponentBase::getScaledPos()
+FloatCoord ComponentBase::getScaledPos() const
 {
 	return nullPos_;
 }
 
-FloatCoord ComponentBase::getPos()
+FloatCoord ComponentBase::getPos() const
 {
 	return nullPos_;
 }
@@ -36,8 +35,7 @@ void ComponentBase::normilizeNullCoords()
 	nullPos_ = FloatCoord{ round(nullPos_.x * 10000) / 10000, round(nullPos_.y * 10000) / 10000 };
 }
 
-
-float ComponentBase::getScale()
+float ComponentBase::getScale() const
 {
 	return scale_;
 }
@@ -47,7 +45,7 @@ void ComponentBase::setScale(float scale)
 	scale_ = scale;
 }
 
-FloatCoord ComponentBase::getScaledSIZE()
+FloatCoord ComponentBase::getScaledSIZE() const
 {
 	return FloatCoord{ size_.x * scale_, size_.y * scale_ };
 }
@@ -113,11 +111,10 @@ void ComponentBase::IncreasePos(float moveX, float moveY)
 	normilizeNullCoords();
 }
 
-bool ComponentBase::isMouseOn()
+bool ComponentBase::isMouseOn() const
 {
 	if (px::mousePosX >= 0 && px::mousePosX <= px::windowWidth && px::mousePosY >= 0 && px::mousePosY <= px::windowHeight)
 	{
-
 		if (px::absoluteMousePosX > nullPos_.x && px::absoluteMousePosX  < nullPos_.x + getScaledSIZE().x &&
 			px::absoluteMousePosY > nullPos_.y && px::absoluteMousePosY < nullPos_.y + getScaledSIZE().y)
 		{
@@ -127,14 +124,14 @@ bool ComponentBase::isMouseOn()
 	return false;
 }
 
-bool ComponentBase::isClickOn()
+bool ComponentBase::isClickOn() const
 {
 	if (isMouseOn() && px::isMouseLeftClick && !px::isMouseAlreadyUsed)
 		return true;
 	return false;
 }
 
-bool ComponentBase::isRectCollisionWith(ComponentBase& obj)
+bool ComponentBase::isRectCollisionWith(ComponentBase& obj) const
 {
 	bool collisionX = this->nullPos_.x + this->getScaledSIZE().x >= obj.nullPos_.x &&
 		obj.nullPos_.x + obj.getScaledSIZE().x >= this->nullPos_.x;
@@ -143,7 +140,7 @@ bool ComponentBase::isRectCollisionWith(ComponentBase& obj)
 	return collisionX && collisionY;
 }
 
-bool ComponentBase::isRoundCollisionWith(ComponentBase& obj)
+bool ComponentBase::isRoundCollisionWith(ComponentBase& obj) const
 {
 	glm::vec2 center(this->nullPos_.x + this->getScaledSIZE().x / 2, this->nullPos_.y + this->getScaledSIZE().y / 2);
 	glm::vec2 aabb_half_extents(obj.getScaledSIZE().x / 2.0f, obj.getScaledSIZE().y / 2.0f);

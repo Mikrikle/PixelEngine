@@ -7,7 +7,6 @@ PxSwitch::PxSwitch(std::function<void(PxSwitch* self)> callback, Orientation ori
 {
 	orientation_ = orientation;
 	reInit(width, height);
-	active_ = false;
 	setPos(posX, posY);
 	setScale(scale);
 	callback_ = callback;
@@ -20,14 +19,13 @@ void PxSwitch::reInit(float width, float height)
 	toggle.reInit((orientation_ == px::Orientation::HORIZONTAL) ? width / 2 : width, (orientation_ == px::Orientation::HORIZONTAL) ? height : height / 2);
 }
 
-
 void PxSwitch::draw()
 {
 	AbstractRectangle::draw();
 	toggle.draw();
 }
 
-bool PxSwitch::isActive()
+bool PxSwitch::isActive() const
 {
 	return active_;
 }

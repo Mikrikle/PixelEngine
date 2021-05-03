@@ -4,10 +4,6 @@ using namespace engine;
 
 ComponentClickableWidget::ComponentClickableWidget()
 {
-	normalOpacity_ = 1.0f;
-	activeOpacity_ = 0.0f;
-	mouseOnOpacity_ = 0.5f;
-	isPressed_ = false;
 }
 
 void ComponentClickableWidget::setNormalOpacity(float opacity)

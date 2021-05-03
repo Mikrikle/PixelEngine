@@ -17,15 +17,16 @@
 
 namespace px
 {
-	typedef struct
+	struct FloatCoord
 	{
 		float x;
 		float y;
-	} FloatCoord;
+	};
 
 	enum class Orientation
 	{
-		VERTICAL, HORIZONTAL
+		VERTICAL,
+		HORIZONTAL
 	};
 
 	enum class RelativeBindingType
@@ -37,14 +38,16 @@ namespace px
 	};
 
 	// global variables for event handling
+	//   must be initialized to main.cpp
 	extern Shader* DefaultShader;
+	extern int windowWidth;
+	extern int windowHeight;
+	//   initialized in variables.cpp
 	extern bool isMouseAlreadyUsed;
 	extern bool isMouseLeftClick;
 	extern bool isMouseRightClick;
 	extern float absoluteMousePosX;
 	extern float absoluteMousePosY;
-	extern int windowWidth;
-	extern int windowHeight;
 	extern int mousePosX;
 	extern int mousePosY;
 	extern float mouseScrollX;
@@ -71,14 +74,14 @@ namespace px
 			void setTexture(float* pixels, int width, int height);
 			void setImgTexture(std::string path);
 		protected:
-			bool isInited_;
-			float textureOpacity_;
-			unsigned int VAO;
-			unsigned int VBO;
-			unsigned int EBO;
-			unsigned int TEXTURE;
-			int indicesSize_;
-			Shader* shader_;
+			bool isInited_ = false;
+			float textureOpacity_ = 0.5f;
+			unsigned int VAO = 0;
+			unsigned int VBO = 0;
+			unsigned int EBO = 0;
+			unsigned int TEXTURE = 0;
+			int indicesSize_ = 0;
+			Shader* shader_ = nullptr;
 
 			VAOComponent();
 			~VAOComponent();
@@ -114,20 +117,20 @@ namespace px
 		class ComponentBase
 		{
 		public:
-			float getScale();
+			float getScale() const;
 			void setPosAtCenterObj(ComponentBase& obj);
 			void setPosAtCenter();
 			void setPosRelativeTo(ComponentBase& obj, RelativeBindingType side, float offsetX, float offsetY);
 			void setPosAtAbsoluteGrid(int row_num, int col_num);
-			FloatCoord getCenterPos();
-			FloatCoord getScaledPos();
-			FloatCoord getPos();
-			FloatCoord getScaledSIZE();
-			FloatCoord getSIZE();
-			bool isMouseOn();
-			bool isClickOn();
-			bool ComponentBase::isRectCollisionWith(ComponentBase& obj);
-			bool ComponentBase::isRoundCollisionWith(ComponentBase& obj);
+			FloatCoord getCenterPos() const;
+			FloatCoord getScaledPos() const;
+			FloatCoord getPos() const;
+			FloatCoord getScaledSIZE() const;
+			FloatCoord getSIZE() const;
+			bool isMouseOn() const;
+			bool isClickOn() const;
+			bool ComponentBase::isRectCollisionWith(ComponentBase& obj) const;
+			bool ComponentBase::isRoundCollisionWith(ComponentBase& obj) const;
 			virtual void IncreaseScale(float value);
 			virtual void setScale(float scale);
 			virtual void setPos(float x, float y);
@@ -136,7 +139,7 @@ namespace px
 			virtual void update() {};
 			virtual void reInit(float width, float height) {};
 		protected:
-			float scale_;
+			float scale_ = 1.0f;
 			FloatCoord size_;
 			FloatCoord nullPos_;
 			glm::mat4 transformMatrix_;
@@ -176,27 +179,30 @@ namespace px
 			void setAllOpacityes(float normalOpacity, float activeOpacity, float mouseOnOpacity);
 		protected:
 			ComponentClickableWidget();
-			float normalOpacity_;
-			float activeOpacity_;
-			float mouseOnOpacity_;
-			bool isPressed_;
+			float normalOpacity_ = 1.0f;
+			float activeOpacity_ = 0.0f;
+			float mouseOnOpacity_ = 0.5f;
+			bool isPressed_ = false;
 		};
 	}
 
 	// ============================grid============================
 
 	// {object = nullptr, row_span = 1, col_span = 1}
-	typedef struct gObj
+	struct gObj
 	{
 		engine::ComponentBase* obj_ptr{ nullptr };
 		int row_span{ 1 };
 		int col_span{ 1 };
-	} gObj;
- 
+	};
+
 	class GridLayout : public engine::ComponentBase
 	{
 	public:
-		GridLayout(int rows, int cols, std::initializer_list<gObj> objects,
+		GridLayout(int rows, int cols, std::initializer_list<gObj> objects, float width, float height, float scale, float posX, float posY);
+		GridLayout(int rows, int cols, std::initializer_list<gObj> objects);
+		GridLayout();
+		void init(int rows, int cols, std::initializer_list<gObj> objects,
 			float width = 1.0f, float height = 1.0f, float scale = 1.0f, float posX = -1.0f, float posY = -1.0f);
 		void draw() override;
 		void update() override;
@@ -227,6 +233,7 @@ namespace px
 		ManagerObjects();
 		ManagerObjects(std::vector<engine::ComponentBase*> objects);
 		ManagerObjects(std::initializer_list<engine::ComponentBase*> objects);
+		void init(std::initializer_list<engine::ComponentBase*> objects);
 		void appendObj(engine::ComponentBase* obj);
 		void drawAll();
 		void updateAll();
@@ -259,10 +266,10 @@ namespace px
 	public:
 		PxCanvas(int rows, int cols, float width = 1.0f, float height = 1.0f, float scale = 1.0f, float posX = -1.0f, float posY = -1.0f, Shader* shader = DefaultShader);
 		~PxCanvas();
-		int transformPercentsToCoordX(float absolute_x);
-		int transformPercentsToCoordY(float absolute_y);
-		glm::vec3 getPixel();
-		glm::vec3 getPixel(int row, int col);
+		int transformPercentsToCoordX(float absolute_x) const;
+		int transformPercentsToCoordY(float absolute_y) const;
+		glm::vec3 getPixel() const;
+		glm::vec3 getPixel(int row, int col) const;
 		void setPixel(int x, int y, float r, float g, float b);
 		void setPixel(float r, float g, float b);
 		void setPixel(int x, int y, glm::vec3 color);
@@ -273,17 +280,17 @@ namespace px
 		void fillWhite();
 		void draw() override;
 		void update() override;
-		int getRows();
-		int getCols();
-		int getMouseCol();
-		int getMouseRow();
+		int getRows() const;
+		int getCols() const;
+		int getMouseCol() const;
+		int getMouseRow() const;
 
 	private:
 		int rows_;
 		int cols_;
 		std::vector<float> pixelCanvas_;
-		int mousePosCol_;
-		int mousePosRow_;
+		int mousePosCol_ = 0;
+		int mousePosRow_ = 0;
 	};
 
 	// full-screen object with no additional functions
@@ -317,7 +324,7 @@ namespace px
 		void draw();
 		PxRectangle toggle;
 
-		bool isActive();
+		bool isActive() const;
 		void setScale(float scale) override;
 		void IncreaseScale(float value) override;
 		void setPos(float x, float y) override;
@@ -325,7 +332,7 @@ namespace px
 		void reInit(float width, float height) override;
 	private:
 		std::function<void(PxSwitch* self)> callback_;
-		bool active_;
+		bool active_ = false;
 		Orientation orientation_;
 		void setTogglePos();
 	};
@@ -343,8 +350,8 @@ namespace px
 		PxRectangle toggle_route_line;
 
 		void setStep(int step);
-		float getPercentages();
-		int getValue();
+		float getPercentages() const;
+		int getValue() const;
 		void setScale(float scale) override;
 		void IncreaseScale(float value) override;
 		void setPos(float x, float y) override;
@@ -352,9 +359,9 @@ namespace px
 		void reInit(float width, float height) override;
 	private:
 		std::function<void(PxSlider* self)> callback_;
-		float percentages_;
-		float stepSize_;
-		bool mouseGrab_;
+		float percentages_ = 50.0f;
+		float stepSize_ = 1;
+		bool mouseGrab_ = false;
 		Orientation orientation_;
 		void setPercentages();
 	};
@@ -369,7 +376,7 @@ namespace px
 		void draw();
 		PxRectangle mark;
 
-		bool isActive();
+		bool isActive() const;
 		void setScale(float scale) override;
 		void IncreaseScale(float value) override;
 		void setPos(float x, float y) override;
@@ -377,6 +384,33 @@ namespace px
 		void reInit(float width, float height) override;
 	private:
 		std::function<void(PxCheckBox* self)> callback_;
-		bool active_;
+		bool active_ = false;
+	};
+
+	// ============================App============================
+
+	class PxBaseApp
+	{
+	public:
+		virtual void objectsSetting() {};
+		virtual void objectsEvents() {};
+
+		void update()
+		{
+			manager.updateAll();
+			objectsEvents();
+		}
+		void draw()
+		{
+			manager.drawAll();
+		}
+	protected:
+		void init()
+		{
+			objectsSetting();
+		}
+
+		px::GridLayout grid;
+		px::ManagerObjects manager;
 	};
 }

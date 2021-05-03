@@ -10,14 +10,6 @@ void VAOComponent::setTextureOpacity(float opacity)
 
 VAOComponent::VAOComponent()
 {
-	TEXTURE = 0;
-	VAO = 0;
-	VBO = 0;
-	EBO = 0;
-	textureOpacity_ = 0.5f;
-	shader_ = nullptr;
-	indicesSize_ = 0;
-	isInited_ = false;
 }
 
 VAOComponent::~VAOComponent()

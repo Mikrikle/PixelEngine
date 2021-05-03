@@ -11,9 +11,6 @@ PxSlider::PxSlider(std::function<void(PxSlider* self)> callback, Orientation ori
 	setPos(posX, posY);
 	setScale(scale);
 	callback_ = callback;
-	percentages_ = 50.0f;
-	stepSize_ = 1;
-	mouseGrab_ = false;
 	toggle.setColorAsTexture(0.9f, 0.9f, 0.9f);
 	toggle_route_line.setColorAsTexture(0.1f, 0.1f, 0.1f);
 }
@@ -22,7 +19,7 @@ void PxSlider::reInit(float width, float height)
 {
 	AbstractRectangle::reInit(width, height);
 	toggle.reInit((orientation_ == px::Orientation::HORIZONTAL) ? width / 50.0f : width, (orientation_ == px::Orientation::HORIZONTAL) ? height : height / 50.0f);
-	toggle_route_line.reInit((orientation_ == px::Orientation::HORIZONTAL) ? width * 0.95f : width / 4.0f, (orientation_ == px::Orientation::HORIZONTAL) ? height / 4.0f : height * 0.95f);
+	toggle_route_line.reInit((orientation_ == px::Orientation::HORIZONTAL) ? width * 0.85f : width / 4.0f, (orientation_ == px::Orientation::HORIZONTAL) ? height / 4.0f : height * 0.85f);
 }
 
 void PxSlider::setPercentages()
@@ -45,7 +42,7 @@ void PxSlider::setStep(int step)
 	}
 }
 
-int PxSlider::getValue()
+int PxSlider::getValue() const
 {
 	return static_cast<int>(round(percentages_) / stepSize_);
 }
@@ -62,18 +59,34 @@ void PxSlider::update()
 		isPressed_ = true;
 		if (orientation_ == px::Orientation::HORIZONTAL)
 		{
-			if (px::absoluteMousePosX < toggle_route_line.getScaledPos().x + toggle_route_line.getScaledSIZE().x &&
-				px::absoluteMousePosX > toggle_route_line.getScaledPos().x)
+			if (px::absoluteMousePosX <= toggle_route_line.getScaledPos().x + toggle_route_line.getScaledSIZE().x &&
+				px::absoluteMousePosX >= toggle_route_line.getScaledPos().x)
 			{
 				toggle.setPos(px::absoluteMousePosX, this->getPos().y);
+			}
+			else if (px::absoluteMousePosX <= toggle_route_line.getScaledPos().x + toggle_route_line.getScaledSIZE().x)
+			{
+				toggle.setPos(toggle_route_line.getScaledPos().x, this->getPos().y);
+			}
+			else if (px::absoluteMousePosX >= toggle_route_line.getScaledPos().x)
+			{
+				toggle.setPos(toggle_route_line.getScaledPos().x + toggle_route_line.getScaledSIZE().x, this->getPos().y);
 			}
 		}
 		else
 		{
-			if (px::absoluteMousePosY < toggle_route_line.getScaledPos().y + toggle_route_line.getScaledSIZE().y &&
-				px::absoluteMousePosY > toggle_route_line.getScaledPos().y)
+			if (px::absoluteMousePosY <= toggle_route_line.getScaledPos().y + toggle_route_line.getScaledSIZE().y &&
+				px::absoluteMousePosY >= toggle_route_line.getScaledPos().y)
 			{
 				toggle.setPos(this->getPos().x, px::absoluteMousePosY);
+			}
+			else if (px::absoluteMousePosY <= toggle_route_line.getScaledPos().y + toggle_route_line.getScaledSIZE().y)
+			{
+				toggle.setPos(this->getPos().x, toggle_route_line.getScaledPos().y);
+			}
+			else if (px::absoluteMousePosY >= toggle_route_line.getScaledPos().y)
+			{
+				toggle.setPos(this->getPos().x, toggle_route_line.getScaledPos().y + toggle_route_line.getScaledSIZE().y);
 			}
 		}
 		setPercentages();
@@ -100,7 +113,7 @@ void PxSlider::draw()
 	toggle.draw();
 }
 
-float  PxSlider::getPercentages()
+float  PxSlider::getPercentages() const
 {
 	return percentages_;
 }
@@ -111,6 +124,7 @@ void PxSlider::setScale(float scale)
 	toggle_route_line.setScale(scale);
 	toggle_route_line.setPosAtCenterObj(*this);
 	toggle.setScale(scale);
+	toggle.setPosAtCenterObj(toggle_route_line);
 }
 
 void PxSlider::IncreaseScale(float value)
@@ -119,18 +133,19 @@ void PxSlider::IncreaseScale(float value)
 	toggle_route_line.IncreaseScale(value);
 	toggle_route_line.setPosAtCenterObj(*this);
 	toggle.IncreaseScale(value);
+	toggle.setPosAtCenterObj(toggle_route_line);
 }
 
 void PxSlider::setPos(float x, float y)
 {
 	AbstractRectangle::setPos(x, y);
 	toggle_route_line.setPosAtCenterObj(*this);
-	toggle.setPos(x, y);
+	toggle.setPosAtCenterObj(toggle_route_line);
 }
 
 void PxSlider::IncreasePos(float moveX, float moveY)
 {
 	AbstractRectangle::IncreasePos(moveX, moveY);
 	toggle_route_line.setPosAtCenterObj(*this);
-	toggle.IncreasePos(moveX, moveY);
+	toggle.setPosAtCenterObj(toggle_route_line);
 }

@@ -11,7 +11,7 @@ namespace px
 	int mousePosY = 0;
 	float mouseScrollX = 0.0f;
 	float mouseScrollY = 0.0f;
-	bool keyboardKeys[1024]{0};
+	bool keyboardKeys[1024]{ 0 };
 	float deltaTime = 0.0f;
 	float lastFrameTime = 0.0f;
 

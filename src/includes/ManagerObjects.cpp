@@ -5,6 +5,11 @@ ManagerObjects::ManagerObjects()
 {
 }
 
+void ManagerObjects::init(std::initializer_list<engine::ComponentBase*> objects)
+{
+	objects_ = objects;
+}
+
 ManagerObjects::ManagerObjects(std::vector<engine::ComponentBase*> objects)
 {
 	objects_ = objects;

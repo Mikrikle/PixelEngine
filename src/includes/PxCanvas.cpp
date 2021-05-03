@@ -9,8 +9,6 @@ PxCanvas::PxCanvas(int rows, int cols, float width, float height, float scale, f
 	rows_ = rows;
 	cols_ = cols;
 	pixelCanvas_.resize(static_cast<size_t>(cols_ * rows_ * 3), 0.0f);
-	mousePosCol_ = 0;
-	mousePosRow_ = 0;
 	genTexture();
 }
 
@@ -18,12 +16,12 @@ PxCanvas::~PxCanvas()
 {
 }
 
-int PxCanvas::transformPercentsToCoordX(float absolute_x)
+int PxCanvas::transformPercentsToCoordX(float absolute_x) const
 {
 	return static_cast<int>((absolute_x - nullPos_.x) * getCols() / (getSIZE().x * getScale()));
 }
 
-int PxCanvas::transformPercentsToCoordY(float absolute_y)
+int PxCanvas::transformPercentsToCoordY(float absolute_y) const
 {
 	return static_cast<int>(getRows() - ((absolute_y - nullPos_.y) * getRows() / (getSIZE().y * getScale())));
 }
@@ -48,12 +46,12 @@ void px::PxCanvas::update()
 	}
 }
 
-glm::vec3 PxCanvas::getPixel()
+glm::vec3 PxCanvas::getPixel() const
 {
 	return getPixel(mousePosRow_, mousePosCol_);
 }
 
-glm::vec3 PxCanvas::getPixel(int row, int col)
+glm::vec3 PxCanvas::getPixel(int row, int col) const
 {
 	if (row >= 0 && col >= 0 && row <= rows_ && col < cols_)
 	{
@@ -66,22 +64,22 @@ glm::vec3 PxCanvas::getPixel(int row, int col)
 	return glm::vec3(0, 0, 0);
 }
 
-int PxCanvas::getRows()
+int PxCanvas::getRows() const
 {
 	return rows_;
 }
 
-int PxCanvas::getCols()
+int PxCanvas::getCols() const
 {
 	return cols_;
 }
 
-int PxCanvas::getMouseCol()
+int PxCanvas::getMouseCol() const
 {
 	return mousePosCol_;
 }
 
-int PxCanvas::getMouseRow()
+int PxCanvas::getMouseRow() const
 {
 	return mousePosRow_;
 }

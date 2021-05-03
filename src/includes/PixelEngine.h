@@ -5,6 +5,7 @@
 #include <functional>
 #include <algorithm>
 #include <string>
+#include <set>
 
 #include "../shaders/shader.h"
 
@@ -123,14 +124,11 @@ namespace px
 			void setPosRelativeTo(ComponentBase& obj, RelativeBindingType side, float offsetX, float offsetY);
 			void setPosAtAbsoluteGrid(int row_num, int col_num);
 			FloatCoord getCenterPos() const;
-			FloatCoord getScaledPos() const;
 			FloatCoord getPos() const;
 			FloatCoord getScaledSIZE() const;
 			FloatCoord getSIZE() const;
 			bool isMouseOn() const;
 			bool isClickOn() const;
-			bool ComponentBase::isRectCollisionWith(ComponentBase& obj) const;
-			bool ComponentBase::isRoundCollisionWith(ComponentBase& obj) const;
 			virtual void IncreaseScale(float value);
 			virtual void setScale(float scale);
 			virtual void setPos(float x, float y);
@@ -237,8 +235,16 @@ namespace px
 		void appendObj(engine::ComponentBase* obj);
 		void drawAll();
 		void updateAll();
+		void addToIgnoreDrawingLsist(int index);
+		void addToIgnoreUpdatingLsist(int index);
+		void removeFromIgnoreDrawingList(int index);
+		void removeFromIgnoreUpdatingList(int index);
 	private:
 		std::vector<engine::ComponentBase*> objects_;
+		std::set<int> ignoreDrawList_;
+		bool isInDrawIgnore(int index);
+		std::set<int> ignoreUpdateList_;
+		bool isInUpdateIgnore(int index);
 	};
 
 	// Class for placing objects relative to each other

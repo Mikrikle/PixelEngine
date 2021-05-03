@@ -105,7 +105,7 @@ void GridLayout::arrangeObjects()
 
 void GridLayout::setObjectPosition(gObj& obj, int nrow, int ncol)
 {
-	obj.obj_ptr->setPos(this->getScaledPos().x + ncol * cell_width_, this->getScaledPos().y + nrow * cell_height_);
+	obj.obj_ptr->setPos(this->getPos().x + ncol * cell_width_, this->getPos().y + nrow * cell_height_);
 }
 
 void GridLayout::setScale(float scale)

@@ -12,17 +12,12 @@ ComponentBase::ComponentBase(float width, float height)
 
 FloatCoord ComponentBase::getCenterPos() const
 {
-	return FloatCoord{ getScaledPos().x + getScaledSIZE().x / 2, getScaledPos().y + getScaledSIZE().y / 2 };
+	return FloatCoord{ getPos().x + getScaledSIZE().x / 2, getPos().y + getScaledSIZE().y / 2 };
 }
 
 FloatCoord ComponentBase::getSIZE() const
 {
 	return size_;
-}
-
-FloatCoord ComponentBase::getScaledPos() const
-{
-	return nullPos_;
 }
 
 FloatCoord ComponentBase::getPos() const
@@ -69,7 +64,7 @@ void ComponentBase::setPosAtCenter()
 
 void ComponentBase::setPosAtCenterObj(ComponentBase& obj)
 {
-	setPos(obj.getScaledPos().x + (obj.getScaledSIZE().x - this->getScaledSIZE().x) / 2.0f, obj.getScaledPos().y + (obj.getScaledSIZE().y - this->getScaledSIZE().y) / 2.0f);
+	setPos(obj.getPos().x + (obj.getScaledSIZE().x - this->getScaledSIZE().x) / 2.0f, obj.getPos().y + (obj.getScaledSIZE().y - this->getScaledSIZE().y) / 2.0f);
 }
 
 void ComponentBase::setPosRelativeTo(ComponentBase& obj, RelativeBindingType side, float offsetX, float offsetY)
@@ -78,22 +73,22 @@ void ComponentBase::setPosRelativeTo(ComponentBase& obj, RelativeBindingType sid
 	{
 	case RelativeBindingType::SIDE_LEFT:
 
-		setPos(obj.getScaledPos().x - this->getScaledSIZE().x + offsetX, obj.getScaledPos().y + offsetY);
+		setPos(obj.getPos().x - this->getScaledSIZE().x + offsetX, obj.getPos().y + offsetY);
 		break;
 
 	case RelativeBindingType::SIDE_RIGHT:
 
-		setPos(obj.getScaledPos().x + obj.getScaledSIZE().x + offsetX, obj.getScaledPos().y + offsetY);
+		setPos(obj.getPos().x + obj.getScaledSIZE().x + offsetX, obj.getPos().y + offsetY);
 		break;
 
 	case RelativeBindingType::SIDE_TOP:
 
-		setPos(obj.getScaledPos().x + offsetX, obj.getScaledPos().y + obj.getScaledSIZE().y + offsetY);
+		setPos(obj.getPos().x + offsetX, obj.getPos().y + obj.getScaledSIZE().y + offsetY);
 		break;
 
 	case RelativeBindingType::SIDE_BOTTOM:
 
-		setPos(obj.getScaledPos().x + offsetX, obj.getScaledPos().y - this->getScaledSIZE().y + offsetY);
+		setPos(obj.getPos().x + offsetX, obj.getPos().y - this->getScaledSIZE().y + offsetY);
 		break;
 	}
 }
@@ -129,28 +124,4 @@ bool ComponentBase::isClickOn() const
 	if (isMouseOn() && px::isMouseLeftClick && !px::isMouseAlreadyUsed)
 		return true;
 	return false;
-}
-
-bool ComponentBase::isRectCollisionWith(ComponentBase& obj) const
-{
-	bool collisionX = this->nullPos_.x + this->getScaledSIZE().x >= obj.nullPos_.x &&
-		obj.nullPos_.x + obj.getScaledSIZE().x >= this->nullPos_.x;
-	bool collisionY = this->nullPos_.y + this->getScaledSIZE().y >= obj.nullPos_.y &&
-		obj.nullPos_.y + obj.getScaledSIZE().y >= this->nullPos_.y;
-	return collisionX && collisionY;
-}
-
-bool ComponentBase::isRoundCollisionWith(ComponentBase& obj) const
-{
-	glm::vec2 center(this->nullPos_.x + this->getScaledSIZE().x / 2, this->nullPos_.y + this->getScaledSIZE().y / 2);
-	glm::vec2 aabb_half_extents(obj.getScaledSIZE().x / 2.0f, obj.getScaledSIZE().y / 2.0f);
-	glm::vec2 aabb_center(
-		obj.nullPos_.x + aabb_half_extents.x,
-		obj.nullPos_.y + aabb_half_extents.y
-	);
-	glm::vec2 difference = center - aabb_center;
-	glm::vec2 clamped = glm::clamp(difference, -aabb_half_extents, aabb_half_extents);
-	glm::vec2 closest = aabb_center + clamped;
-	difference = closest - center;
-	return glm::length(difference) < this->nullPos_.x / 2;
 }

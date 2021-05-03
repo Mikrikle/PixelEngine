@@ -17,17 +17,16 @@ public:
 	App()
 	{
 		init();
-		manager.init({ &test_r, &color_slider, &colored_rectangle });
-		grid.init(3, 3, { 
+		manager.init({ &test_r, &color_slider, &colored_rectangle, &isShowRound });
+		grid.init(3, 3, {
 			{nullptr, 1, 3},
-			{}, {&px::GridLayout(2, 1, { {&test_r}, {&colored_rectangle} })}, {},
+			{}, {&px::GridLayout(2, 1, { {&test_r}, {&colored_rectangle} })}, {&isShowRound},
 			{&color_slider, 1, 3} }
 		);
 	}
 
 	void objectsEvents()
 	{
-		
 	}
 
 	void objectsSetting()
@@ -35,10 +34,26 @@ public:
 		test_r.setImgTexture("../../src/includes/textures/round.png");
 		test_r.setTextureOpacity(1.0f);
 		colored_rectangle.setTextureOpacity(1.0f);
+		colored_rectangle.setColorAsTexture(0.0f, color_slider.getPercentages() / 100.0f, 0.0f);
+		isShowRound.setColorAsTexture(0.5f, 0.0f, 0.0f);
 	}
 
 private:
-	px::PxSlider color_slider{ [this](px::PxSlider *self) {colored_rectangle.setColorAsTexture(0.0f, self->getPercentages() / 100.0f, 0.0f); }};
+	px::PxSlider color_slider{ [this](px::PxSlider* self) {
+		colored_rectangle.setColorAsTexture(0.0f, self->getPercentages() / 100.0f, 0.0f);
+	} };
+
+	px::PxCheckBox isShowRound{ [this](px::PxCheckBox* self) {
+		if (self->isActive())
+		{
+			manager.removeFromIgnoreDrawingList(0);
+		}
+		else
+		{
+			manager.addToIgnoreDrawingLsist(0);
+		}
+	} };
+
 	px::PxRectangle colored_rectangle;
 	px::PxRectangle test_r;
 };

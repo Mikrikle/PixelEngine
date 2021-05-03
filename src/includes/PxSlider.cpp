@@ -26,11 +26,11 @@ void PxSlider::setPercentages()
 {
 	if (orientation_ == px::Orientation::HORIZONTAL)
 	{
-		percentages_ = (fabs(toggle.getScaledPos().x - toggle_route_line.getScaledPos().x)) / toggle_route_line.getScaledSIZE().x * 100.0f;
+		percentages_ = (fabs(toggle.getPos().x - toggle_route_line.getPos().x)) / toggle_route_line.getScaledSIZE().x * 100.0f;
 	}
 	else
 	{
-		percentages_ = (fabs(toggle.getScaledPos().y - toggle_route_line.getScaledPos().y)) / toggle_route_line.getScaledSIZE().y * 100.0f;
+		percentages_ = (fabs(toggle.getPos().y - toggle_route_line.getPos().y)) / toggle_route_line.getScaledSIZE().y * 100.0f;
 	}
 }
 
@@ -59,34 +59,34 @@ void PxSlider::update()
 		isPressed_ = true;
 		if (orientation_ == px::Orientation::HORIZONTAL)
 		{
-			if (px::absoluteMousePosX <= toggle_route_line.getScaledPos().x + toggle_route_line.getScaledSIZE().x &&
-				px::absoluteMousePosX >= toggle_route_line.getScaledPos().x)
+			if (px::absoluteMousePosX <= toggle_route_line.getPos().x + toggle_route_line.getScaledSIZE().x &&
+				px::absoluteMousePosX >= toggle_route_line.getPos().x)
 			{
 				toggle.setPos(px::absoluteMousePosX, this->getPos().y);
 			}
-			else if (px::absoluteMousePosX <= toggle_route_line.getScaledPos().x + toggle_route_line.getScaledSIZE().x)
+			else if (px::absoluteMousePosX <= toggle_route_line.getPos().x + toggle_route_line.getScaledSIZE().x)
 			{
-				toggle.setPos(toggle_route_line.getScaledPos().x, this->getPos().y);
+				toggle.setPos(toggle_route_line.getPos().x, this->getPos().y);
 			}
-			else if (px::absoluteMousePosX >= toggle_route_line.getScaledPos().x)
+			else if (px::absoluteMousePosX >= toggle_route_line.getPos().x)
 			{
-				toggle.setPos(toggle_route_line.getScaledPos().x + toggle_route_line.getScaledSIZE().x, this->getPos().y);
+				toggle.setPos(toggle_route_line.getPos().x + toggle_route_line.getScaledSIZE().x, this->getPos().y);
 			}
 		}
 		else
 		{
-			if (px::absoluteMousePosY <= toggle_route_line.getScaledPos().y + toggle_route_line.getScaledSIZE().y &&
-				px::absoluteMousePosY >= toggle_route_line.getScaledPos().y)
+			if (px::absoluteMousePosY <= toggle_route_line.getPos().y + toggle_route_line.getScaledSIZE().y &&
+				px::absoluteMousePosY >= toggle_route_line.getPos().y)
 			{
 				toggle.setPos(this->getPos().x, px::absoluteMousePosY);
 			}
-			else if (px::absoluteMousePosY <= toggle_route_line.getScaledPos().y + toggle_route_line.getScaledSIZE().y)
+			else if (px::absoluteMousePosY <= toggle_route_line.getPos().y + toggle_route_line.getScaledSIZE().y)
 			{
-				toggle.setPos(this->getPos().x, toggle_route_line.getScaledPos().y);
+				toggle.setPos(this->getPos().x, toggle_route_line.getPos().y);
 			}
-			else if (px::absoluteMousePosY >= toggle_route_line.getScaledPos().y)
+			else if (px::absoluteMousePosY >= toggle_route_line.getPos().y)
 			{
-				toggle.setPos(this->getPos().x, toggle_route_line.getScaledPos().y + toggle_route_line.getScaledSIZE().y);
+				toggle.setPos(this->getPos().x, toggle_route_line.getPos().y + toggle_route_line.getScaledSIZE().y);
 			}
 		}
 		setPercentages();

@@ -403,15 +403,13 @@ namespace px
 		virtual void objectsSetting() {};
 		virtual void objectsEvents() {};
 
-		void update()
+		void run()
 		{
 			manager.updateAll();
 			objectsEvents();
-		}
-		void draw()
-		{
 			manager.drawAll();
 		}
+
 	protected:
 		void init()
 		{

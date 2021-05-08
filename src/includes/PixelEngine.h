@@ -118,6 +118,7 @@ namespace px
 		class ComponentBase
 		{
 		public:
+			ComponentBase& operator=(const ComponentBase&) = delete;
 			float getScale() const;
 			void setPosAtCenterObj(ComponentBase& obj);
 			void setPosAtCenter();
@@ -143,7 +144,7 @@ namespace px
 			glm::mat4 transformMatrix_;
 
 			void normilizeNullCoords();
-			ComponentBase(float width, float height);
+			explicit ComponentBase(float width, float height);
 		};
 
 		// Сlass that binds the VAOrectangle to the position on the screen and events
@@ -158,9 +159,9 @@ namespace px
 			void reInit(float width, float height) override;
 			void draw() override;
 		protected:
-			AbstractRectangle(float width, float height, Shader* shader, float scale, float posX, float posY);
-			AbstractRectangle(float width, float height, Shader* shader);
-			AbstractRectangle(Shader* shader);
+			explicit AbstractRectangle(float width, float height, Shader* shader, float scale, float posX, float posY);
+			explicit AbstractRectangle(float width, float height, Shader* shader);
+			explicit AbstractRectangle(Shader* shader);
 		};
 
 		// class for basic functions for processing mouse clicks on widgets
@@ -197,8 +198,8 @@ namespace px
 	class GridLayout : public engine::ComponentBase
 	{
 	public:
-		GridLayout(int rows, int cols, std::initializer_list<gObj> objects, float width, float height, float scale, float posX, float posY);
-		GridLayout(int rows, int cols, std::initializer_list<gObj> objects);
+		explicit GridLayout(int rows, int cols, std::initializer_list<gObj> objects, float width, float height, float scale, float posX, float posY);
+		explicit GridLayout(int rows, int cols, std::initializer_list<gObj> objects);
 		GridLayout();
 		void init(int rows, int cols, std::initializer_list<gObj> objects,
 			float width = 1.0f, float height = 1.0f, float scale = 1.0f, float posX = -1.0f, float posY = -1.0f);
@@ -229,8 +230,8 @@ namespace px
 	{
 	public:
 		ManagerObjects();
-		ManagerObjects(std::vector<engine::ComponentBase*> objects);
-		ManagerObjects(std::initializer_list<engine::ComponentBase*> objects);
+		explicit ManagerObjects(std::vector<engine::ComponentBase*> objects);
+		explicit ManagerObjects(std::initializer_list<engine::ComponentBase*> objects);
 		void init(std::initializer_list<engine::ComponentBase*> objects);
 		void appendObj(engine::ComponentBase* obj);
 		void drawAll();
@@ -263,14 +264,14 @@ namespace px
 	class PxRectangle : public engine::AbstractRectangle
 	{
 	public:
-		PxRectangle(float width = 1.0f, float height = 1.0f, float scale = 1.0f, float posX = -1.0f, float posY = -1.0f, Shader* shader = DefaultShader);
+		explicit PxRectangle(float width = 1.0f, float height = 1.0f, float scale = 1.0f, float posX = -1.0f, float posY = -1.0f, Shader* shader = DefaultShader);
 	};
 
 	// Canvas based on a pixel texture of the selected size
 	class PxCanvas : public engine::AbstractRectangle
 	{
 	public:
-		PxCanvas(int rows, int cols, float width = 1.0f, float height = 1.0f, float scale = 1.0f, float posX = -1.0f, float posY = -1.0f, Shader* shader = DefaultShader);
+		explicit PxCanvas(int rows, int cols, float width = 1.0f, float height = 1.0f, float scale = 1.0f, float posX = -1.0f, float posY = -1.0f, Shader* shader = DefaultShader);
 		~PxCanvas();
 		int transformPercentsToCoordX(float absolute_x) const;
 		int transformPercentsToCoordY(float absolute_y) const;
@@ -303,20 +304,35 @@ namespace px
 	class PxBackground : public engine::AbstractRectangle
 	{
 	public:
-		PxBackground(Shader* shader = DefaultShader);
+		explicit PxBackground(Shader* shader = DefaultShader);
 	};
 
 	// ============================widgets============================
+
+	// modification of the PxRectangle, for safe use in widget classes as a public field
+	class WidgetsAdditionalObject : private PxRectangle
+	{
+		friend class PxSwitch;
+		friend class PxSlider;
+		friend class PxCheckBox;
+	public:
+		using PxRectangle::setColorAsTexture;
+		using PxRectangle::setUnderTextureColor;
+		using PxRectangle::setTexture;
+		using PxRectangle::isMouseOn;
+		using PxRectangle::isClickOn;
+	};
 
 	// the button that the passed function is called when clicked
 	class PxButton : public engine::AbstractRectangle, public engine::ComponentClickableWidget
 	{
 	public:
-		PxButton(std::function<void(PxButton* self)> callback = nullptr,
+		explicit PxButton(std::function<void(PxButton* self)> callback = nullptr,
 			float width = 1.0f, float height = 1.0f, float scale = 1.0f, float posX = -1.0f, float posY = -1.0f, Shader* shader = DefaultShader);
 		void update() override;
 
 	private:
+		using AbstractRectangle::setTextureOpacity;
 		std::function<void(PxButton* self)> callback_;
 	};
 
@@ -324,12 +340,11 @@ namespace px
 	class PxSwitch : public engine::AbstractRectangle, public engine::ComponentClickableWidget
 	{
 	public:
-		PxSwitch(std::function<void(PxSwitch* self)> callback = nullptr, Orientation orientation = px::Orientation::HORIZONTAL,
+		WidgetsAdditionalObject toggle;
+		explicit PxSwitch(std::function<void(PxSwitch* self)> callback = nullptr, Orientation orientation = px::Orientation::HORIZONTAL,
 			float width = 1.0f, float height = 1.0f, float scale = 1.0f, float posX = -1.0f, float posY = -1.0f, Shader* shader = DefaultShader);
 		void update() override;
 		void draw();
-		PxRectangle toggle;
-
 		void setActive(bool isActive);
 		bool isActive() const;
 		void setScale(float scale) override;
@@ -348,14 +363,16 @@ namespace px
 	class PxSlider : public engine::AbstractRectangle, public engine::ComponentClickableWidget
 	{
 	public:
-
-		PxSlider(std::function<void(PxSlider* self)> callback = nullptr, Orientation orientation = px::Orientation::HORIZONTAL,
+		WidgetsAdditionalObject toggle;
+		WidgetsAdditionalObject toggle_route_line;
+		void setToggleWidth(float width);
+		void setToggleHeight(float height);
+		void setToggleRouteLineWidth(float width);
+		void setToggleRouteLineHeight(float height);
+		explicit PxSlider(std::function<void(PxSlider* self)> callback = nullptr, Orientation orientation = px::Orientation::HORIZONTAL,
 			float width = 1.0f, float height = 1.0f, float scale = 1.0f, float posX = -1.0f, float posY = -1.0f, Shader* shader = DefaultShader);
 		void update() override;
 		void draw();
-		PxRectangle toggle;
-		PxRectangle toggle_route_line;
-
 		void setStep(int step);
 		float getPercentages() const;
 		int getValue() const;
@@ -366,6 +383,10 @@ namespace px
 		void reInit(float width, float height) override;
 	private:
 		std::function<void(PxSlider* self)> callback_;
+		float toggleWidthRatio_;
+		float toggleHeightRatio_;
+		float toggleRouteLineWidthRatio_;
+		float toggleRouteLineHeightRatio_;
 		float percentages_ = 50.0f;
 		float stepSize_ = 1;
 		bool mouseGrab_ = false;
@@ -377,12 +398,11 @@ namespace px
 	class PxCheckBox : public engine::AbstractRectangle, public engine::ComponentClickableWidget
 	{
 	public:
-		PxCheckBox(std::function<void(PxCheckBox* self)> callback = nullptr,
+		WidgetsAdditionalObject mark;
+		explicit PxCheckBox(std::function<void(PxCheckBox* self)> callback = nullptr,
 			float width = 1.0f, float height = 1.0f, float scale = 1.0f, float posX = -1.0f, float posY = -1.0f, Shader* shader = DefaultShader);
 		void update() override;
 		void draw();
-		PxRectangle mark;
-
 		void setActive(bool isActive);
 		bool isActive() const;
 		void setScale(float scale) override;
@@ -391,6 +411,7 @@ namespace px
 		void IncreasePos(float moveX, float moveY) override;
 		void reInit(float width, float height) override;
 	private:
+		using AbstractRectangle::setTextureOpacity;
 		std::function<void(PxCheckBox* self)> callback_;
 		bool active_ = false;
 	};

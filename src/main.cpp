@@ -63,7 +63,11 @@ public:
 		// specify this if you want to create a widget in the active position
 		isShowRound.setActive(true);
 		isSliderWork.setActive(true);
-		
+		// widgets are created from simpler classes
+		// to change a specific part of the widget, contact it directly
+		color_slider.toggle_route_line.setColorAsTexture(0.0f, 1.0f, 0.0f);
+		color_slider.setToggleWidth(0.2f);
+		color_slider.setToggleRouteLineHeight(0.2f);
 	}
 
 private:
@@ -88,10 +92,12 @@ private:
 		if (self->isActive())
 		{
 			manager.addToIgnoreUpdatingLsist(1);
+			color_slider.toggle_route_line.setColorAsTexture(1.0f, 0.0f, 0.0f);
 		}
 		else
 		{
 			manager.removeFromIgnoreUpdatingList(1);
+			color_slider.toggle_route_line.setColorAsTexture(0.0f, 1.0f, 0.0f);
 		}
 	} };
 
@@ -101,7 +107,8 @@ private:
 };
 
 int main()
-{
+{	
+	px::PxButton a;
 	App TestApp;
 	window.enable_blend(); // need for transparent texture
 	while (!window.isShouldClose())

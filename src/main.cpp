@@ -25,7 +25,7 @@ public:
 		// place objects on the grid
 		grid.init(3, 3, {
 			{&cvs, 1, 3},
-			{&isSliderWork}, {&px::GridLayout(2, 1, { {&test_r}, {&colored_rectangle} })}, {&isShowRound},
+			{&isSliderWork}, {&central_grid}, {&isShowRound},
 			{&color_slider, 1, 3} }
 		);
 
@@ -104,6 +104,7 @@ private:
 	px::PxCanvas cvs{100, 300};
 	px::PxRectangle colored_rectangle;
 	px::PxRectangle test_r;
+	px::GridLayout central_grid{ 2, 1, { {&test_r}, {&colored_rectangle} } };
 };
 
 int main()

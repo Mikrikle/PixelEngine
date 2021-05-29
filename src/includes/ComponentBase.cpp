@@ -37,7 +37,10 @@ float ComponentBase::getScale() const
 
 void ComponentBase::setScale(float scale)
 {
-	scale_ = scale;
+	if (scale < 1000.0 && scale > 0.01)
+		scale_ = scale;
+	else
+		PxError::show(PxError::Error::INVALID_VALUE, "setScale", "scale must be more than 0.01 and less than 1000");
 }
 
 FloatCoord ComponentBase::getScaledSIZE() const
@@ -47,8 +50,10 @@ FloatCoord ComponentBase::getScaledSIZE() const
 
 void ComponentBase::IncreaseScale(float value)
 {
-	if ((value > 0 && scale_ < 50.0) || (value < 0 && scale_ > 0.1))
+	if ((value > 0 && scale_ + value < 1000.0) || (value < 0 && scale_ + value > 0.01))
 		scale_ += value;
+	else
+		PxError::show(PxError::Error::INVALID_VALUE, "IncreaseScale", "scale must be more than 0.01 and less than 1000");
 }
 
 void ComponentBase::setPos(float x, float y)

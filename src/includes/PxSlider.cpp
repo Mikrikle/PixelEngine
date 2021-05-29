@@ -32,10 +32,9 @@ PxSlider::PxSlider(std::function<void(PxSlider* self)> callback, Orientation ori
 void PxSlider::reInit(float width, float height)
 {
 	AbstractRectangle::reInit(width, height);
-	toggle.reInit( width * toggleWidthRatio_, height * toggleHeightRatio_);
-	toggle_route_line.reInit(width * toggleRouteLineWidthRatio_, height * toggleRouteLineHeightRatio_ );
+	toggle.reInit(width * toggleWidthRatio_, height * toggleHeightRatio_);
+	toggle_route_line.reInit(width * toggleRouteLineWidthRatio_, height * toggleRouteLineHeightRatio_);
 }
-
 
 void PxSlider::setToggleWidth(float width)
 {
@@ -44,6 +43,8 @@ void PxSlider::setToggleWidth(float width)
 		toggleWidthRatio_ = width;
 		toggle.reInit(width * toggleRouteLineWidthRatio_, toggle.getSIZE().y);
 	}
+	else
+		PxError::show(PxError::Error::INVALID_VALUE, "setToggleWidth", "the width must be between 0 and 1 (0-100 percent of slider width)");
 }
 void PxSlider::setToggleHeight(float height)
 {
@@ -52,6 +53,8 @@ void PxSlider::setToggleHeight(float height)
 		toggleHeightRatio_ = height;
 		toggle.reInit(toggle.getSIZE().x, height * toggleHeightRatio_);
 	}
+	else
+		PxError::show(PxError::Error::INVALID_VALUE, "setToggleHeight", "the height must be between 0 and 1 (0-100 percent of slider height)");
 }
 void PxSlider::setToggleRouteLineWidth(float width)
 {
@@ -61,6 +64,8 @@ void PxSlider::setToggleRouteLineWidth(float width)
 		toggle_route_line.reInit(width * toggleRouteLineWidthRatio_, toggle_route_line.getSIZE().y);
 		toggle_route_line.setPosAtCenterObj(*this);
 	}
+	else
+		PxError::show(PxError::Error::INVALID_VALUE, "setToggleRouteLineWidth", "the width must be between 0 and 1 (0-100 percent of slider width)");
 }
 void PxSlider::setToggleRouteLineHeight(float height)
 {
@@ -70,6 +75,8 @@ void PxSlider::setToggleRouteLineHeight(float height)
 		toggle_route_line.reInit(toggle_route_line.getSIZE().x, height * toggleRouteLineHeightRatio_);
 		toggle_route_line.setPosAtCenterObj(*this);
 	}
+	else
+		PxError::show(PxError::Error::INVALID_VALUE, "setToggleRouteLineHeight", "the height must be between 0 and 1 (0-100 percent of slider height)");
 }
 
 void PxSlider::setPercentages()
@@ -90,6 +97,8 @@ void PxSlider::setStep(int step)
 	{
 		stepSize_ = 100.0f / step;
 	}
+	else
+		PxError::show(PxError::Error::INVALID_VALUE, "setStep", "the number of steps must be greater than 0");
 }
 
 int PxSlider::getValue() const
@@ -112,7 +121,7 @@ void PxSlider::update()
 			if (px::absoluteMousePosX <= toggle_route_line.getPos().x + toggle_route_line.getScaledSIZE().x &&
 				px::absoluteMousePosX >= toggle_route_line.getPos().x)
 			{
-				toggle.setPos(px::absoluteMousePosX - toggle.getSIZE().x/2.0f, this->getPos().y);
+				toggle.setPos(px::absoluteMousePosX - toggle.getSIZE().x / 2.0f, this->getPos().y);
 			}
 			else if (px::absoluteMousePosX <= toggle_route_line.getPos().x + toggle_route_line.getScaledSIZE().x)
 			{

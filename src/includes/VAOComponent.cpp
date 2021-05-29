@@ -6,6 +6,8 @@ void VAOComponent::setTextureOpacity(float opacity)
 {
 	if (opacity >= 0.0 && opacity <= 1.0)
 		textureOpacity_ = opacity;
+	else
+		PxError::show(PxError::Error::INVALID_VALUE, "setTextureOpacity", "the opacity must be between 0 and 1");
 }
 
 VAOComponent::VAOComponent()
@@ -65,15 +67,25 @@ void VAOComponent::genTexture()
 
 void VAOComponent::setTexture(float* pixels, int width, int height)
 {
-	glBindTexture(GL_TEXTURE_2D, TEXTURE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, height, width, 0, GL_RGB, GL_FLOAT, pixels);
+	if (width > 0 && height > 0)
+	{
+		glBindTexture(GL_TEXTURE_2D, TEXTURE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, height, width, 0, GL_RGB, GL_FLOAT, pixels);
+	}
+	else
+		PxError::show(PxError::Error::INVALID_VALUE, "setTexture", "width and height must be more than 0");
 }
 
 void VAOComponent::setColorAsTexture(float r, float g, float b)
 {
-	float pixels[3]{ r ,g ,b };
-	glBindTexture(GL_TEXTURE_2D, TEXTURE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_FLOAT, pixels);
+	if (r >= 0 && g >= 0 && b >= 0 && r <= 1.0f && g <= 1.0f && b <= 1.0f)
+	{
+		float pixels[3]{ r ,g ,b };
+		glBindTexture(GL_TEXTURE_2D, TEXTURE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_FLOAT, pixels);
+	}
+	else
+		PxError::show(PxError::Error::INVALID_VALUE, "setColorAsTexture", "the values must be between 0 and 1");
 }
 
 void VAOComponent::setColorAsTexture(glm::vec3 color)
@@ -101,8 +113,6 @@ void VAOComponent::setImgTexture(std::string path)
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
-	{
-		std::cout << "ERROR::VAO::Failed to load texture" << std::endl;
-	}
+		PxError::show(PxError::Error::OPEN_GL, "setImgTexture", "Failed to load texture");
 	stbi_image_free(data);
 }

@@ -38,6 +38,20 @@ namespace px
 		SIDE_RIGHT
 	};
 
+	// class for informing about non-critical errors
+	class PxError
+	{
+	public:
+		enum class Error
+		{
+			INVALID_VALUE,
+			OPEN_GL,
+		};
+		static void show(Error e, std::string func_name, std::string msg);
+	private:
+		PxError();
+	};
+
 	// global variables for event handling
 	//   must be initialized to main.cpp
 	extern Shader* DefaultShader;
@@ -85,7 +99,7 @@ namespace px
 			Shader* shader_ = nullptr;
 
 			VAOComponent();
-			~VAOComponent();
+			virtual ~VAOComponent();
 			virtual void drawVAO() = 0;
 			void genBuffers(GLfloat* vertices, GLuint sizeV, GLuint* indices, GLuint sizeI);
 			void genTexture();
@@ -137,6 +151,7 @@ namespace px
 			virtual void draw() {};
 			virtual void update() {};
 			virtual void reInit(float width, float height) {};
+			virtual ~ComponentBase() {};
 		protected:
 			float scale_ = 1.0f;
 			FloatCoord size_;
@@ -272,7 +287,7 @@ namespace px
 	{
 	public:
 		explicit PxCanvas(int rows, int cols, float width = 1.0f, float height = 1.0f, float scale = 1.0f, float posX = -1.0f, float posY = -1.0f, Shader* shader = DefaultShader);
-		~PxCanvas();
+		~PxCanvas() override;
 		int transformPercentsToCoordX(float absolute_x) const;
 		int transformPercentsToCoordY(float absolute_y) const;
 		glm::vec3 getPixel() const;
